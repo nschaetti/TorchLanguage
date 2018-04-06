@@ -81,38 +81,19 @@ class FunctionWord(Transformer):
         :param text: Text to convert
         :return: Tensor of word vectors
         """
-        # Inputs as tensor
-        inputs = torch.FloatTensor(1, self.input_dim)
-
-        # Null symbol
-        null_symbol = torch.zeros(1, self.input_dim)
-        null_symbol[0, -1] = 1.0
-
-        # Start
-        start = True
+        # List of function words
+        function_words = list()
 
         # For each tokens
         for token in self.nlp(text):
             # Replace if not function word
-            if token.text not in self.symbols:
-                token_fw = u"X"
-            else:
-                token_fw = token.text
-            # end if
-
-            # Get tag
-            fw = self.tag_to_symbol(token_fw)
-
-            # Add
-            if not start:
-                inputs = torch.cat((inputs, fw), dim=0)
-            else:
-                inputs = fw
-                start = False
+            if token.text in self.get_tags():
+                # Add
+                function_words.append(token.text)
             # end if
         # end for
 
-        return inputs, inputs.size()[0]
+        return function_words
     # end convert
 
 # end FunctionWord
