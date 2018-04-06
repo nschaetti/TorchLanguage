@@ -14,30 +14,12 @@ class Character2Gram(Transformer):
     """
 
     # Constructor
-    def __init__(self, uppercase=False, gram_to_ix=None, start_ix=0, fixed_length=-1, overlapse=True):
+    def __init__(self, uppercase=False, overlapse=True):
         """
         Constructor
         """
-        # Gram to ix
-        if gram_to_ix is not None:
-            self.gram_count = len(gram_to_ix.keys())
-            self.gram_to_ix = gram_to_ix
-        else:
-            self.gram_count = start_ix
-            self.gram_to_ix = dict()
-        # end if
-
-        # Ix to gram
-        self.ix_to_gram = dict()
-        if gram_to_ix is not None:
-            for gram in gram_to_ix.keys():
-                self.ix_to_gram[gram_to_ix[gram]] = gram
-            # end for
-        # end if
-
         # Properties
         self.uppercase = uppercase
-        self.fixed_length = fixed_length
         self.overlapse = overlapse
 
         # Super constructor
@@ -61,16 +43,6 @@ class Character2Gram(Transformer):
         """
         return 1
     # end input_dim
-
-    # Vocabulary size
-    @property
-    def voc_size(self):
-        """
-        Vocabulary size
-        :return:
-        """
-        return self.gram_count
-    # end voc_size
 
     ##############################################
     # Private
@@ -103,38 +75,14 @@ class Character2Gram(Transformer):
         # Step
         if self.overlapse:
             step = 1
+            last = 1
         else:
             step = 2
+            last = 0
         #  end if
 
-        # Add to voc
-        for i in np.arange(0, len(text) - 1, step):
-            gram = self.to_upper(text[i] + text[i+1])
-            if gram not in self.gram_to_ix.keys():
-                self.gram_to_ix[gram] = self.gram_count
-                self.ix_to_gram[self.gram_count] = gram
-                self.gram_count += 1
-            # end if
-        # end for
-
         # List of character to 2grams
-        text_idxs = [self.gram_to_ix[self.to_upper(text[i] + text[i+1])] for i in range(len(text)-1)]
-
-        # To long tensor
-        text_idxs = torch.LongTensor(text_idxs)
-
-        # Check length
-        if self.fixed_length != -1:
-            if text_idxs.size(0) > self.fixed_length:
-                text_idxs = text_idxs[:self.fixed_length]
-            elif text_idxs.size(0) < self.fixed_length:
-                zero_idxs = torch.LongTensor(self.fixed_length).fill_(0)
-                zero_idxs[:text_idxs.size(0)] = text_idxs
-                text_idxs = zero_idxs
-            # end if
-        # end if
-
-        return text_idxs, text_idxs.size(0)
+        return [self.to_upper(text[i:i+2]) for i in np.arange(0, len(text)-last, step)]
     # end convert
 
 # end Character2Gram
