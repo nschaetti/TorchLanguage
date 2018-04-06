@@ -52,7 +52,7 @@ class GensimModel(object):
     ##############################################
 
     # Convert a string
-    def __call__(self, text):
+    def __call__(self, tokens):
         """
         Convert a string to a ESN input
         :param text: Text to convert
@@ -70,7 +70,7 @@ class GensimModel(object):
         self.oov = 0.0
 
         # For each tokens
-        for token in tokenize(text):
+        for token in tokens:
             found = False
             # Try normal
             try:
@@ -103,7 +103,7 @@ class GensimModel(object):
         # OOV
         self.oov = zero / count * 100.0
 
-        return inputs, inputs.size()[0]
+        return inputs
     # end convert
 
     ##############################################
