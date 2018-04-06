@@ -15,15 +15,17 @@ class Embedding(object):
     """
 
     # Constructor
-    def __init__(self, weights):
+    def __init__(self, embedding):
         """
         Constructor
         :param weights: Embedding weight matrix
         """
         # Properties
-        self.weights = weights
-        self.voc_size = weights.size(0)
-        self.embedding_dim = weights.size(1)
+        self.weights = embedding.weights
+        self.voc_size = embedding.voc_size
+        self.embedding_dim = embedding.embedding_dim
+        self.token_to_ix = embedding.gram_to_ix
+        self.ix_to_token = embedding.ix_to_gram
     # end __init__
 
     ##############################################
