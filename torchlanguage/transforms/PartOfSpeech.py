@@ -52,25 +52,19 @@ class PartOfSpeech(Transformer):
         :param text: Text to convert
         :return: Tensor of word vectors
         """
-        # Inputs as tensor
-        inputs = torch.FloatTensor(1, self.input_dim)
-
-        # Start
-        start = True
+        # Pos
+        pos_list = []
 
         # For each tokens
         for token in self.nlp(text):
-            pos = self.tag_to_symbol(token.pos_)
-
-            if not start:
-                inputs = torch.cat((inputs, pos), dim=0)
+            if token.pos_ in self.get_tags():
+                pos_list.append(token.pos_)
             else:
-                inputs = pos
-                start = False
+                pos_list.append(u"X")
             # end if
         # end for
 
-        return inputs, inputs.size()[0]
+        return pos_list
     # end convert
 
 # end PartOfSpeech
