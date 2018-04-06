@@ -3,6 +3,7 @@
 
 # Imports
 import torchlanguage.transforms
+import torchlanguage.embeddings
 
 
 # Text to transform
@@ -15,9 +16,9 @@ for text in text_to_transform:
 
 # Transformer
 transformer = torchlanguage.transforms.Compose([
-    torchlanguage.transforms.Tag(),
+    torchlanguage.transforms.Character(),
     torchlanguage.transforms.ToIndex(),
-    torchlanguage.transforms.ToOneHot(voc_size=15)
+    torchlanguage.transforms.Embedding(torchlanguage.embeddings.CharacterEmbedding(n_gram=1, context=3, dim=10))
 ])
 
 # Show it transformed
