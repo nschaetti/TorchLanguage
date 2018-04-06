@@ -79,7 +79,7 @@ class GloveVector(object):
         # OOV
         self.oov = zero / count * 100.0
 
-        return inputs, inputs.size()[0]
+        return inputs
     # end convert
 
     ##############################################
