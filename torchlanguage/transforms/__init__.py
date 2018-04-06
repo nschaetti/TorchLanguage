@@ -12,10 +12,12 @@ from .GensimModel import GensimModel
 from .GloveVector import GloveVector
 from .PartOfSpeech import PartOfSpeech
 from .Tag import Tag
+from .ToIndex import ToIndex
 from .Token import Token
+from .ToOneHot import ToOneHot
 from .Transformer import Transformer
 
 __all__ = [
     'Character', 'Character2Gram', 'Character3Gram', 'Compose', 'Embedding', 'FunctionWord', 'GensimModel', 'Transformer', 'GloveVector',
-    'PartOfSpeech', 'Tag', 'Token'
+    'PartOfSpeech', 'Tag', 'ToIndex', 'Token', 'ToOneHot'
 ]
