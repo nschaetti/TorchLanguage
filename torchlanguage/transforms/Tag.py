@@ -54,38 +54,23 @@ class Tag(Transformer):
         :param text: Text to convert
         :return: Tensor of word vectors
         """
-        # Inputs as tensor
-        inputs = torch.FloatTensor(1, self.input_dim)
-
-        # Null symbol
-        null_symbol = torch.zeros(1, self.input_dim)
-        null_symbol[0, -1] = 1.0
-
-        # Start
-        start = True
+        # List of tags
+        tag_list = list()
 
         # For each tokens
         for token in self.nlp(text):
             # Replace if not function word
-            if token.tag_ not in self.symbols:
+            if token.tag_ not in self.get_tags():
                 token_tag = u"X"
             else:
                 token_tag = token.tag_
             # end if
 
-            # Get tag
-            tag = self.tag_to_symbol(token_tag)
-
             # Add
-            if not start:
-                inputs = torch.cat((inputs, tag), dim=0)
-            else:
-                inputs = tag
-                start = False
-            # end if
+            tag_list.append(token_tag)
         # end for
 
-        return inputs, inputs.size()[0]
+        return tag_list
     # end convert
 
 # end FunctionWord
