@@ -56,13 +56,13 @@ class Compose(Transformer):
         for index, transform in enumerate(self.transforms):
             # Transform
             if index == 0:
-                outputs, size = transform(text)
+                outputs = transform(text)
             else:
-                outputs, size = transform(outputs)
+                outputs = transform(outputs)
             # end if
         # end for
 
-        return outputs, size
+        return outputs
     # end convert
 
 # end Compose
