@@ -14,12 +14,11 @@ class Character2Gram(Transformer):
     """
 
     # Constructor
-    def __init__(self, uppercase=False, overlapse=True):
+    def __init__(self, overlapse=True):
         """
         Constructor
         """
         # Properties
-        self.uppercase = uppercase
         self.overlapse = overlapse
 
         # Super constructor
@@ -45,23 +44,6 @@ class Character2Gram(Transformer):
     # end input_dim
 
     ##############################################
-    # Private
-    ##############################################
-
-    # To upper
-    def to_upper(self, gram):
-        """
-        To upper
-        :param gram:
-        :return:
-        """
-        if not self.uppercase:
-            return gram.lower()
-        # end if
-        return gram
-    # end to_upper
-
-    ##############################################
     # Override
     ##############################################
 
@@ -82,7 +64,7 @@ class Character2Gram(Transformer):
         #  end if
 
         # List of character to 2grams
-        return [self.to_upper(text[i:i+2]) for i in np.arange(0, len(text)-last, step)]
+        return [text[i:i+2] for i in np.arange(0, len(text)-last, step)]
     # end convert
 
 # end Character2Gram

@@ -13,13 +13,10 @@ class Character(Transformer):
     """
 
     # Constructor
-    def __init__(self, uppercase=False):
+    def __init__(self):
         """
         Constructor
         """
-        # Properties
-        self.uppercase = uppercase
-
         # Super constructor
         super(Character, self).__init__()
     # end __init__
@@ -41,23 +38,6 @@ class Character(Transformer):
         """
         return 1
     # end input_dim
-
-    ##############################################
-    # Private
-    ##############################################
-
-    # To upper
-    def to_upper(self, gram):
-        """
-        To upper
-        :param gram:
-        :return:
-        """
-        if not self.uppercase:
-            return gram.lower()
-        # end if
-        return gram
-    # end to_upper
 
     ##############################################
     # Override
