@@ -7,7 +7,7 @@ import torchlanguage.embeddings
 
 
 # Text to transform
-text_to_transform = [u"Hello, what is your name?", u"Hi! What time is it?", u"Hello, I am not there for the moment."]
+text_to_transform = [u"Hello, what is your name?\nHi! What time is it?\nHello, I am not there for the moment."]
 
 # Show it
 for text in text_to_transform:
@@ -16,13 +16,14 @@ for text in text_to_transform:
 
 # Transformer
 transformer = torchlanguage.transforms.Compose([
-    torchlanguage.transforms.Character(),
-    torchlanguage.transforms.ToIndex(),
-    torchlanguage.transforms.Embedding(torchlanguage.embeddings.CharacterEmbedding(n_gram=1, context=3, dim=10)),
-    torchlanguage.transforms.ToNGram(n=2)
+    torchlanguage.transforms.RemoveLines()
+    # torchlanguage.transforms.Character(),
+    # torchlanguage.transforms.ToIndex(),
+    # torchlanguage.transforms.Embedding(torchlanguage.embeddings.CharacterEmbedding(n_gram=1, context=3, dim=10)),
+    # torchlanguage.transforms.ToNGram(n=2)
 ])
 
 # Show it transformed
 for text in text_to_transform:
-    print(transformer(text).size())
+    print(transformer(text))
 # end for
