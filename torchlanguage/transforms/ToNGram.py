@@ -69,12 +69,12 @@ class ToNGram(Transformer):
             return [u[i:i+self.n] for i in np.arange(0, len(u) - last, step)]
         elif type(u) is torch.LongTensor or type(u) is torch.FloatTensor or type(u) is torch.Tensor:
             dtype = type(u)
-            if torch.ndim == 2:
+            if torch.dim() == 2:
                 n_gram_tensor = dtype(u.size(0), self.n)
                 for i in np.arange(0, len(u) - last, step):
                     n_gram_tensor[i] = u[i:i+self.n]
                 # end for
-            elif torch.ndim == 3:
+            elif torch.dim() == 3:
                 n_gram_tensor = dtype(u.size(0), self.n, u.size(1))
                 for i in np.arange(0, len(u) - last, step):
                     n_gram_tensor[i] = u[i:i+self.n]
