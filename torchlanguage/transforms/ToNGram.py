@@ -63,7 +63,7 @@ class ToNGram(Transformer):
             last = 1
         else:
             step = self.n
-            last = self.n + 1
+            last = self.n - 1
         #  end if
 
         # List
