@@ -73,6 +73,8 @@ class ToNGram(Transformer):
             dtype = type(u)
             if u.dim() == 1:
                 n_gram_tensor = dtype(u.size(0), self.n)
+                print(n_gram_tensor[0].size())
+                print(u[0:self.n].size())
                 for i in np.arange(0, len(u) - last, step):
                     n_gram_tensor[i, :] = u[i:i+self.n]
                 # end for
