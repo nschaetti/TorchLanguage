@@ -5,6 +5,7 @@
 import torch
 from .Transformer import Transformer
 import numpy as np
+import math
 
 
 # Input signal n-gram
@@ -75,7 +76,7 @@ class ToNGram(Transformer):
             if self.overlapse:
                 length = u.size(0) - self.n + 1
             else:
-                length = int(torch.floor(u.size(0) / self.n))
+                length = int(math.floor(u.size(0) / self.n))
             # end if
 
             # Dimension
