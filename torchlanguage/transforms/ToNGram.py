@@ -78,7 +78,6 @@ class ToNGram(Transformer):
                     print(u[i:i+self.n].size())
                     print(n_gram_tensor[i])
                     print(u[i:i+self.n])
-                    exit()
                     n_gram_tensor[i] = u[i:i+self.n]
                 # end for
             elif u.dim() == 2:
