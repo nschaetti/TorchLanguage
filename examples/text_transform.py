@@ -18,7 +18,7 @@ for text in text_to_transform:
 transformer = torchlanguage.transforms.Compose([
     torchlanguage.transforms.Character(),
     torchlanguage.transforms.ToIndex(),
-    # torchlanguage.transforms.Embedding(torchlanguage.embeddings.CharacterEmbedding(n_gram=1, context=3, dim=10)),
+    torchlanguage.transforms.Embedding(torchlanguage.embeddings.CharacterEmbedding(n_gram=1, context=3, dim=10)),
     torchlanguage.transforms.ToNGram(n=3)
 ])
 
