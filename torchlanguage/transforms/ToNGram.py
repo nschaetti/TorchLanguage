@@ -63,7 +63,7 @@ class ToNGram(Transformer):
             step = self.n
             last = 0
         #  end if
-
+        print(type(u))
         # List
         if type(u) is list:
             return [u[i:i+self.n] for i in np.arange(0, len(u) - last, step)]
