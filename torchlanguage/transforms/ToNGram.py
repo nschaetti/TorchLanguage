@@ -65,6 +65,7 @@ class ToNGram(Transformer):
         #  end if
         print(u)
         print(u.size())
+        print(u.dim())
         # List
         if type(u) is list:
             return [u[i:i+self.n] for i in np.arange(0, len(u) - last, step)]
