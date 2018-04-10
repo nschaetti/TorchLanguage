@@ -24,5 +24,5 @@ transformer = torchlanguage.transforms.Compose([
 
 # Show it transformed
 for text in text_to_transform:
-    print(transformer(text))
+    print(transformer(text).size())
 # end for
