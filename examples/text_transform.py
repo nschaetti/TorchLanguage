@@ -6,7 +6,7 @@ import torchlanguage.embeddings
 
 
 # Text to transform
-text_to_transform = [u"Hello, what is your name?\nHi! What time is it?\nHello, I am not there for the moment.\nCount to 9!"]
+text_to_transform = [u"Hello, what is your name?", u"Hi! What time is it?", u"Hello, I am not there for the moment."]
 
 # Show it
 for text in text_to_transform:
