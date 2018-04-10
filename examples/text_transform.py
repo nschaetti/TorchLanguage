@@ -17,7 +17,7 @@ for text in text_to_transform:
 # Transformer
 transformer = torchlanguage.transforms.Compose([
     torchlanguage.transforms.RemoveLines(),
-    torchlanguage.transforms.RemoveCharacter(char_to_remove=['a', 't'])
+    torchlanguage.transforms.RemoveRegex(regex=r'time')
     # torchlanguage.transforms.Character(),
     # torchlanguage.transforms.ToIndex(),
     # torchlanguage.transforms.Embedding(torchlanguage.embeddings.CharacterEmbedding(n_gram=1, context=3, dim=10)),
