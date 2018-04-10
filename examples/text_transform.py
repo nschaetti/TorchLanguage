@@ -2,7 +2,6 @@
 #
 
 # Imports
-import torchlanguage.transforms
 import torchlanguage.embeddings
 
 
@@ -18,11 +17,15 @@ for text in text_to_transform:
 transformer = torchlanguage.transforms.Compose([
     torchlanguage.transforms.RemoveLines(),
     torchlanguage.transforms.RemoveRegex(regex=r'(w|W)[a-z]+')
-    # torchlanguage.transforms.Character(),
-    # torchlanguage.transforms.ToIndex(),
-    # torchlanguage.transforms.Embedding(torchlanguage.embeddings.CharacterEmbedding(n_gram=1, context=3, dim=10)),
-    # torchlanguage.transforms.ToNGram(n=2)
 ])
+
+# Transformer
+"""transformer = torchlanguage.transforms.Compose([
+    torchlanguage.transforms.Character(),
+    torchlanguage.transforms.ToIndex(),
+    torchlanguage.transforms.Embedding(torchlanguage.embeddings.CharacterEmbedding(n_gram=1, context=3, dim=10)),
+    torchlanguage.transforms.ToNGram(n=2)
+])"""
 
 # Show it transformed
 for text in text_to_transform:
