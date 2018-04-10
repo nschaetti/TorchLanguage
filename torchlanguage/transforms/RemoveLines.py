@@ -50,7 +50,7 @@ class RemoveLines(Transformer):
         :param text: Text to convert
         :return: Tensor of word vectors
         """
-        text = text.replace(u"\n", u"")
+        text = text.replace(u"\n", u" ")
         text = text.replace(u"\r", u"")
         return text
     # end convert
