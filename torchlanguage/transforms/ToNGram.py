@@ -57,6 +57,7 @@ class ToNGram(Transformer):
         :return: Tensor or list
         """
         print(u)
+        print(u.size())
         # Step
         if self.overlapse:
             step = 1
