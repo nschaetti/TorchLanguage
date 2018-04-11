@@ -2,12 +2,11 @@
 #
 
 # Imports
-import torchlanguage.transforms
 import torchlanguage.embeddings
 
 
 # Text to transform
-text_to_transform = [u"Hello, what is your name?\nHi! What time is it?\nHello, I am not there for the moment.\nCount to 9!"]
+text_to_transform = [u"Hello, what is your name?", u"Hi! What time is it?", u"Hello, I am not there for the moment."]
 
 # Show it
 for text in text_to_transform:
@@ -18,11 +17,15 @@ for text in text_to_transform:
 transformer = torchlanguage.transforms.Compose([
     torchlanguage.transforms.RemoveLines(),
     torchlanguage.transforms.RemoveRegex(regex=r'(w|W)[a-z]+')
-    # torchlanguage.transforms.Character(),
-    # torchlanguage.transforms.ToIndex(),
-    # torchlanguage.transforms.Embedding(torchlanguage.embeddings.CharacterEmbedding(n_gram=1, context=3, dim=10)),
-    # torchlanguage.transforms.ToNGram(n=2)
 ])
+
+# Transformer
+"""transformer = torchlanguage.transforms.Compose([
+    torchlanguage.transforms.Character(),
+    torchlanguage.transforms.ToIndex(),
+    torchlanguage.transforms.Embedding(torchlanguage.embeddings.CharacterEmbedding(n_gram=1, context=3, dim=10)),
+    torchlanguage.transforms.ToNGram(n=2)
+])"""
 
 # Show it transformed
 for text in text_to_transform:
