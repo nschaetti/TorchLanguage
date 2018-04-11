@@ -50,7 +50,7 @@ class ToLower(Transformer):
         :param text: Text to convert
         :return: Tensor of word vectors
         """
-        return text.tolower()
+        return text.lower()
     # end convert
 
 # end ToLower

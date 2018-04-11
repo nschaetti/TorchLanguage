@@ -50,7 +50,7 @@ class ToUpper(Transformer):
         :param text: Text to convert
         :return: Tensor of word vectors
         """
-        return text.toupper()
+        return text.upper()
     # end convert
 
 # end ToUpper
