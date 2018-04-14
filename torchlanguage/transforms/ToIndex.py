@@ -76,7 +76,10 @@ class ToIndex(object):
         # Add to voc
         for i in range(len(text)):
             token = text[i]
-            if token not in self.token_to_ix.keys():
+            # if token not in self.token_to_ix.keys():
+            try:
+                ix = self.token_to_ix[token]
+            except KeyError:
                 self.token_to_ix[token] = self.token_count
                 self.ix_to_token[self.token_count] = token
                 self.token_count += 1
