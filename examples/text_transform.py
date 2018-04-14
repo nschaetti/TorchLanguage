@@ -14,18 +14,16 @@ for text in text_to_transform:
 # end for
 
 # Transformer
-transformer = torchlanguage.transforms.Compose([
+"""transformer = torchlanguage.transforms.Compose([
     torchlanguage.transforms.RemoveLines(),
     torchlanguage.transforms.RemoveRegex(regex=r'(w|W)[a-z]+')
-])
+])"""
 
 # Transformer
-"""transformer = torchlanguage.transforms.Compose([
-    torchlanguage.transforms.Character(),
-    torchlanguage.transforms.ToIndex(),
-    torchlanguage.transforms.Embedding(torchlanguage.embeddings.CharacterEmbedding(n_gram=1, context=3, dim=10)),
-    torchlanguage.transforms.ToNGram(n=2)
-])"""
+transformer = torchlanguage.transforms.Compose([
+    torchlanguage.transforms.GloveVector(),
+    torchlanguage.transforms.DropOut(prob=0.1)
+])
 
 # Show it transformed
 for text in text_to_transform:
