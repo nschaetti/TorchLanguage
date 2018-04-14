@@ -77,7 +77,11 @@ class GloveVector(object):
         # end for
 
         # OOV
-        self.oov = zero / count * 100.0
+        try:
+            self.oov = zero / count * 100.0
+        except:
+            self.oov = 0.0
+        # end try
 
         return inputs
     # end convert
