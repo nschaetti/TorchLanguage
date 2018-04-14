@@ -48,10 +48,14 @@ class ToLength(object):
         new_tensor.fill_(0)
 
         # Set
-        if x.size(0) < self.length:
-            new_tensor[:x.size(0)] = x
+        if x.dim() == 0:
+            return new_tensor
         else:
-            new_tensor = x[:self.length]
+            if x.size(0) < self.length:
+                new_tensor[:x.size(0)] = x
+            else:
+                new_tensor = x[:self.length]
+            # end if
         # end if
 
         return new_tensor
