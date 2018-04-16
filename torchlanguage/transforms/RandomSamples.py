@@ -3,6 +3,7 @@
 
 # Imports
 import torch
+import numpy as np
 from .Transformer import Transformer
 
 
@@ -50,14 +51,43 @@ class RandomSamples(Transformer):
     ##############################################
 
     # Convert a string
-    def __call__(self, text):
+    def __call__(self, x):
         """
         Convert a string to a ESN input
-        :param text: Text to convert
+        :param x: Input tensor
         :return: Tensor of word vectors
         """
-        # List of character
-        return [text[i] for i in range(len(text))]
+        # Start
+        start = True
+
+        # Result
+        result = None
+
+        # Empty tensor
+        if x.dim() == 0:
+            return x
+        # end if
+
+        # Length
+        if type(x) is torch.LongTensor:
+            length = x.size(1)
+        elif type(x) is torch.FloatTensor and type(x) is torch.DoubleTensor:
+            length = x.size(2)
+        # end if
+
+        # For each sample
+        for n in range(self.n_samples):
+            start_index = np.random.randint(0, length - self.sample_size)
+            sample = x[:, start_index:start_index + self.sample_size]
+            if start:
+                result = sample
+                start = False
+            else:
+                result = torch.cat((result, sample), dim=0)
+            # end if
+        # end for
+
+        return result
     # end convert
 
 # end FunctionWord
