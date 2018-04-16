@@ -6,7 +6,7 @@ import torchlanguage.embeddings
 
 
 # Text to transform
-text_to_transform = [u"Hello, what is your name?", u"Hi! What time is it?", u"Hello, I am not there for the moment."]
+text_to_transform = [u"", u"Hello, what is your name?", u"Hi! What time is it?", u"Hello, I am not there for the moment."]
 
 # Show it
 for text in text_to_transform:
@@ -21,8 +21,9 @@ for text in text_to_transform:
 
 # Transformer
 transformer = torchlanguage.transforms.Compose([
-    torchlanguage.transforms.GloveVector(),
-    torchlanguage.transforms.DropOut(prob=0.1)
+    torchlanguage.transforms.Character(),
+    torchlanguage.transforms.ToIndex(start_ix=1),
+    torchlanguage.transforms.ToLength(length=25)
 ])
 
 # Show it transformed
