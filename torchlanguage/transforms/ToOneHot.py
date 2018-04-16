@@ -15,7 +15,7 @@ class ToOneHot(object):
     def __init__(self, voc_size):
         """
         Constructor
-        :param model: Spacy's model to load.
+        :param voc_size: Vocabulary size
         """
         # Properties
         self.voc_size = voc_size
