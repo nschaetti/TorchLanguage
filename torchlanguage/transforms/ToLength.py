@@ -30,14 +30,61 @@ class ToLength(object):
     def __call__(self, x):
         """
         Convert a string to a ESN input
-        :param text: Text to convert
+        :param x: Input tensor
         :return: Tensor of word vectors
+        """
+        # Start
+        start = True
+
+        # Result
+        result = None
+
+        # For each sample
+        if x.dim() > 0:
+            for b in range(x.size(0)):
+                if start:
+                    result = self._transform(x[b]).unsqueeze(0)
+                    start = False
+                else:
+                    result = torch.cat((result, self._transform(x[b]).unsqueeze(0)), dim=0)
+                # end if
+            # end for
+        else:
+            return x
+        # end if
+
+        return result
+    # end convert
+
+    ##############################################
+    # Private
+    ##############################################
+
+    # Get inputs size
+    def _get_inputs_size(self):
+        """
+        Get inputs size.
+        :return:
+        """
+        return self.input_dim
+    # end if
+
+    ##############################################
+    # Private
+    ##############################################
+
+    # Transform
+    def _transform(self, x):
+        """
+        Transform input
+        :param x:
+        :return:
         """
         # Tensor type
         tensor_type = x.__class__
 
-        # Empty tensor
-        if x.dim() == 2:
+        # Long Tensor (idx) or Float (embeddings)
+        if type(x) == torch.FloatTensor or type(x) == torch.DoubleTensor:
             self.input_dim = x.size(1)
             new_tensor = tensor_type(self.length, x.size(1))
         else:
@@ -59,23 +106,6 @@ class ToLength(object):
         # end if
 
         return new_tensor
-    # end convert
-
-    ##############################################
-    # Private
-    ##############################################
-
-    # Get inputs size
-    def _get_inputs_size(self):
-        """
-        Get inputs size.
-        :return:
-        """
-        return self.input_dim
-    # end if
-
-    ##############################################
-    # Static
-    ##############################################
+    # end _transform
 
 # end ToLength
