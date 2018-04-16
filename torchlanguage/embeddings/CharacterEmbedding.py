@@ -6,7 +6,11 @@ import torch
 import os
 import urllib
 import zipfile
+import torch.utils.model_zoo as model_zoo
 
+
+# Embedding url
+embedding_url = 'http://www.nilsschaetti.com/embedding/'
 
 # Character embedding
 class CharacterEmbedding(object):
