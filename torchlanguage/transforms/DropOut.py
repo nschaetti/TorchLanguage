@@ -33,6 +33,41 @@ class DropOut(object):
         :param x: Tensor
         :return: Tensor of word vectors
         """
+        # Start
+        start = True
+
+        # Result
+        result = None
+
+        # For each sample
+        if x.dim() > 0:
+            for b in range(x.size(0)):
+                transformed = self._transform(x[b]).unsqueeze(0)
+                if start:
+                    result = transformed
+                    start = False
+                else:
+                    result = torch.cat((result, transformed), dim=0)
+                # end if
+            # end for
+        else:
+            return x
+        # end if
+
+        return result
+    # end convert
+
+    ##############################################
+    # Private
+    ##############################################
+
+    # Transform
+    def _transform(self, x):
+        """
+        Transform input
+        :param x:
+        :return:
+        """
         # Tensor type
         tensor_type = x.__class__
 
@@ -40,7 +75,7 @@ class DropOut(object):
         mask = torch.bernoulli(torch.FloatTensor(x.size(0)).fill_(1.0 - self.prob))
 
         # Empty tensor
-        if x.dim() == 2:
+        if type(x) is torch.FloatTensor or type(x) is torch.DoubleTensor:
             self.input_dim = x.size(1)
             replace_tensor = tensor_type(self.input_dim)
             replace_tensor.fill_(self.replace_by)
@@ -49,17 +84,17 @@ class DropOut(object):
                     x[i] = replace_tensor
                 # end if
             # end for
-        else:
+        elif type(x) is torch.LongTensor:
             replace_tensor = self.replace_by
             x[torch.eq(mask, 0)] = replace_tensor
+        else:
+            raise NotImplementedError(
+                u"Transformation on type other than Float/DoubleTensor or LongTensor not implemented"
+            )
         # end if
 
         return x
-    # end convert
-
-    ##############################################
-    # Private
-    ##############################################
+    # end _transform
 
     # Get inputs size
     def _get_inputs_size(self):
