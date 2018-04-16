@@ -40,33 +40,34 @@ class ToOneHot(object):
     ##############################################
 
     # Convert a string
-    def __call__(self, idxs):
+    def __call__(self, x):
         """
         Convert a string to a ESN input
         :param idxs: Indexes to convert
         :return: Tensor of word vectors
         """
-        # Inputs as tensor
-        inputs = torch.FloatTensor(1, self.input_dim)
-
         # Start
         start = True
 
-        # For each tokens
-        for i in range(idxs.size(0)):
-            # One hot vector
-            one_hot = torch.zeros(1, self.input_dim)
-            one_hot[0, idxs[i]] = 1.0
+        # Result
+        result = None
 
-            if not start:
-                inputs = torch.cat((inputs, one_hot), dim=0)
-            else:
-                inputs = one_hot
-                start = False
-            # end if
-        # end for
+        # For each sample
+        if x.dim() > 0:
+            for b in range(x.size(0)):
+                transformed = self._transform(x[b])
+                if start:
+                    result = transformed
+                    start = False
+                else:
+                    result = torch.cat((result, transformed), dim=0)
+                # end if
+            # end for
+        else:
+            return x
+        # end if
 
-        return inputs
+        return result
     # end convert
 
     ##############################################
@@ -81,6 +82,39 @@ class ToOneHot(object):
         """
         return self.voc_size
     # end if
+
+    # Transform
+    def _transform(self, idxs):
+        """
+        Transform input
+        :param x:
+        :return:
+        """
+        # Inputs as tensor
+        inputs = torch.FloatTensor()
+
+        # Start
+        start = True
+
+        # For each tokens
+        if idxs.dim() > 0:
+            for i in range(idxs.size(0)):
+                # One hot vector
+                one_hot = torch.zeros(1, self.input_dim)
+                one_hot[0, idxs[i]] = 1.0
+
+                if not start:
+                    inputs = torch.cat((inputs, one_hot), dim=0)
+                else:
+                    inputs = one_hot
+                    start = False
+                # end if
+            # end for
+            return inputs.unsqueeze(0)
+        else:
+            return inputs
+        # end if
+    # end _transform
 
     ##############################################
     # Static
