@@ -54,6 +54,21 @@ class Character2Gram(Transformer):
         :param text: Text to convert
         :return: Tensor of word vectors
         """
+        # List of character
+        return self._transform(text)
+    # end convert
+
+    ##############################################
+    # Private
+    ##############################################
+
+    # Transform
+    def _transform(self, x):
+        """
+        Transform input
+        :param x:
+        :return:
+        """
         # Step
         if self.overlapse:
             step = 1
@@ -64,7 +79,7 @@ class Character2Gram(Transformer):
         #  end if
 
         # List of character to 2grams
-        return [text[i:i+2] for i in np.arange(0, len(text)-last, step)]
-    # end convert
+        return [x[i:i + 2] for i in np.arange(0, len(x) - last, step)]
+    # end _transform
 
 # end Character2Gram
