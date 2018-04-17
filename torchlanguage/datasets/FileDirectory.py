@@ -27,6 +27,7 @@ class FileDirectory(Dataset):
         # Properties
         self.root = root
         self.transform = transform
+        self.download_url = download_url
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -71,7 +72,7 @@ class FileDirectory(Dataset):
         path_to_zip = os.path.join(self.root, "dataset.zip")
 
         # Download
-        urllib.urlretrieve("http://www.nilsschaetti.com/datasets/dataset.zip", path_to_zip)
+        urllib.urlretrieve(self.download_url, path_to_zip)
 
         # Unzip
         zip_ref = zipfile.ZipFile(path_to_zip, 'r')
