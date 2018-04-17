@@ -41,8 +41,6 @@ class FileDirectory(Dataset):
 
         # List file
         self.files = os.listdir(root)
-        print(self.files)
-        print(len(self.files))
     # end __init__
 
     #############################################
