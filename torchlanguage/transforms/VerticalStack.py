@@ -3,29 +3,27 @@
 
 # Imports
 import torch
-import numpy as np
 from .Transformer import Transformer
 
 
-# Create random samples of a given size from a tensor of one or two dimensions
-class RandomSamples(Transformer):
+# Take a list of transformer (to tensor) and stack them
+# on  the input dimension.
+class VerticalStack(Transformer):
     """
-    Create random samples of a given size from a tensor of one or two dimensions
+    Take a list of transformer (to tensor) and stack them
+    on  the input dimension.
     """
 
     # Constructor
-    def __init__(self, n_samples, sample_size):
+    def __init__(self, transformers):
         """
         Constructor
-        :param n_samples: Number of samples
-        :param sample_size: Samples size
         """
         # Super constructor
-        super(RandomSamples, self).__init__()
+        super(VerticalStack, self).__init__()
 
         # Properties
-        self.n_samples = n_samples
-        self.sample_size = sample_size
+        self.transformers = transformers
     # end __init__
 
     ##############################################
@@ -63,31 +61,17 @@ class RandomSamples(Transformer):
         # Result
         result = None
 
-        # Empty tensor
-        if x.dim() == 0:
-            return x
-        # end if
-
-        # Length
-        if type(x) is torch.LongTensor:
-            length = x.size(1)
-        elif type(x) is torch.FloatTensor and type(x) is torch.DoubleTensor:
-            length = x.size(2)
-        # end if
-
-        # For each sample
-        for n in range(self.n_samples):
-            start_index = np.random.randint(0, length - self.sample_size)
-            sample = x[:, start_index:start_index + self.sample_size]
+        # For each transformers
+        for t in self.transformers:
             if start:
-                result = sample
+                result = t(x)
                 start = False
             else:
-                result = torch.cat((result, sample), dim=0)
+                result = torch.cat((result, t(x)), dim=2)
             # end if
         # end for
 
         return result
     # end convert
 
-# end FunctionWord
+# end VerticalStack

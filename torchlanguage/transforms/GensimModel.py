@@ -58,6 +58,20 @@ class GensimModel(object):
         :param text: Text to convert
         :return: Tensor of word vectors
         """
+        return self._transform(tokens).unsqueeze(0)
+    # end convert
+
+    ##############################################
+    # Private
+    ##############################################
+
+    # Transform
+    def _transform(self, tokens):
+        """
+        Transform input
+        :param tokens:
+        :return:
+        """
         # Inputs as tensor
         inputs = torch.FloatTensor(1, self.input_dim)
 
@@ -104,8 +118,6 @@ class GensimModel(object):
         self.oov = zero / count * 100.0
 
         return inputs
-    # end convert
+    # end _transform
 
-    ##############################################
-    # Static
-    #########################################
+# end GensimModel

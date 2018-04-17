@@ -50,4 +50,18 @@ class Transformer(object):
     # Static
     ##############################################
 
+    ##############################################
+    # Private
+    ##############################################
+
+    # Transform
+    def _transform(self, x):
+        """
+        Transform input
+        :param x:
+        :return:
+        """
+        pass
+    # end _transform
+
 # end TextTransformer

@@ -36,25 +36,57 @@ class ToNGram(Transformer):
     # Properties
     ##############################################
 
-    @property
-    def input_dim(self):
-        """
-        Input dimension
-        :return:
-        """
-        return self.input_size
-    # end input_dim
-
     ##############################################
     # Override
     ##############################################
 
     # Convert a string
-    def __call__(self, u):
+    def __call__(self, x):
         """
         Convert a string to a ESN input
-        :param u: Signal to transform
+        :param x: Signal to transform
         :return: Tensor or list
+        """
+        # Add dim if needed
+        if type(x) is list:
+            return self._transform(x)
+        elif type(x) is torch.LongTensor or type(x) is torch.FloatTensor or type(x) is torch.DoubleTensor:
+            # Start
+            start = True
+
+            # Result
+            result = None
+
+            # For each sample
+            if x.dim() > 0:
+                for b in range(x.size(0)):
+                    if start:
+                        result = self._transform(x[b]).unsqueeze(0)
+                        start = False
+                    else:
+                        result = torch.cat((result, self._transform(x[b]).unsqueeze(0)), dim=0)
+                    # end if
+                # end for
+            else:
+                return x
+            # end if
+
+            return result
+        else:
+            raise NotImplementedError(u"ToNGram for type other than list or tensor not implemented")
+        # end if
+    # end convert
+
+    ##############################################
+    # Private
+    ##############################################
+
+    # Transform
+    def _transform(self, u):
+        """
+        Transform input
+        :param x:
+        :return:
         """
         # Step
         if self.overlapse:
@@ -67,8 +99,8 @@ class ToNGram(Transformer):
 
         # List
         if type(u) is list:
-            return [u[i:i+self.n] for i in np.arange(0, len(u) - last, step)]
-        elif type(u) is torch.LongTensor or type(u) is torch.FloatTensor or type(u) is torch.Tensor:
+            return [u[i:i + self.n] for i in np.arange(0, len(u) - last, step)]
+        elif type(u) is torch.LongTensor or type(u) is torch.FloatTensor or type(u) is torch.Tensor or type(u) is torch.DoubleTensor:
             # Output type
             dtype = type(u)
 
@@ -83,16 +115,16 @@ class ToNGram(Transformer):
             if u.dim() == 1:
                 n_gram_tensor = dtype(length, self.n).fill_(0)
                 for i, j in enumerate(np.arange(0, u.size(0) - last, step)):
-                    n_gram_tensor[i] = u[j:j+self.n]
+                    n_gram_tensor[i] = u[j:j + self.n]
                 # end for
             elif u.dim() == 2:
                 n_gram_tensor = dtype(length, self.n, u.size(1)).fill_(0)
                 for i, j in enumerate(np.arange(0, u.size(0) - last, step)):
-                    n_gram_tensor[i] = u[j:j+self.n]
+                    n_gram_tensor[i] = u[j:j + self.n]
                 # end for
             # end if
             return n_gram_tensor
         # end if
-    # end convert
+    # end _transform
 
 # end ToNGram

@@ -46,6 +46,42 @@ class ToFrequencyVector(object):
         :param idxs: Tensor of indexes
         :return: Tensor of frequencies
         """
+        # Start
+        start = True
+
+        # Result
+        result = None
+
+        # For each sample
+        if idxs.dim() > 0:
+            for b in range(idxs.size(0)):
+                freq_tensor = self._transform(idxs[b])
+                freq_tensor = freq_tensor.unsqueeze(0)
+                if start:
+                    result = freq_tensor
+                    start = False
+                else:
+                    result = torch.cat((result, freq_tensor), dim=0)
+                # end if
+            # end for
+        else:
+            return idxs
+        # end if
+
+        return result
+    # end convert
+
+    ##############################################
+    # Private
+    ##############################################
+
+    # Transform
+    def _transform(self, idxs):
+        """
+        Transform input
+        :param x:
+        :return:
+        """
         # Tensor with zeros
         freq_tensor = torch.zeros(self.voc_size)
 
@@ -58,11 +94,7 @@ class ToFrequencyVector(object):
         freq_tensor /= idxs.size(0)
 
         return freq_tensor
-    # end convert
-
-    ##############################################
-    # Private
-    ##############################################
+    # end _transform
 
     # Get inputs size
     def _get_inputs_size(self):
