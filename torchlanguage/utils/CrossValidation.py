@@ -31,6 +31,19 @@ class CrossValidation(Dataset):
     # end __init__
 
     ###################################
+    # PUBLIC
+    ###################################
+
+    # Next fold
+    def next_fold(self):
+        """
+        Next fold
+        :return:
+        """
+        self.fold += 1
+    # end next_fold
+
+    ###################################
     # OVERRIDE
     ###################################
 
