@@ -28,5 +28,6 @@ for data in data_loader:
     inputs, label = data
     print(inputs)
     print(label)
+    print(label[0])
     print(type(label))
 # end for
