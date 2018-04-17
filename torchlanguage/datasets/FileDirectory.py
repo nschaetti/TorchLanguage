@@ -100,9 +100,10 @@ class FileDirectory(Dataset):
         :param idx:
         :return:
         """
+        print(idx)
         # Truth
         file_name = self.files[idx]
-
+        print(file_name)
         # Get class name
         class_name = file_name[:file_name.find("_")]
 
