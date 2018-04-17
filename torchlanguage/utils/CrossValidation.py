@@ -70,7 +70,7 @@ class CrossValidation(Dataset):
         # Get target set
         start_index = self.fold * self.k
         test_set = self.indexes[start_index:start_index+self.fold_length]
-        train_set = np.remove(self.indexes, test_set)
+        train_set = np.delete(self.indexes, test_set)
 
         # Train/test
         if self.train:
