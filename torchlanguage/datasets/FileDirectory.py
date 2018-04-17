@@ -105,7 +105,7 @@ class FileDirectory(Dataset):
         file_name = self.files[idx]
 
         # Get class name
-        class_name = unicode(file_name[:file_name.find("_")])
+        class_name = unicode(file_name[:file_name.find("_")][0])
 
         if self.transform is not None:
             return self.transform(codecs.open(os.path.join(self.root, self.files[idx]), 'rb', encoding='utf-8').read()), class_name
