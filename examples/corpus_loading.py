@@ -25,7 +25,8 @@ data_loader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=2)
 # For each batch
 for data in data_loader:
     # Inputs and outputs
-    inputs, targets = data
+    inputs, label = data
     print(inputs)
-    print(targets)
+    print(label)
+    print(type(label))
 # end for
