@@ -5,14 +5,7 @@
 import torch
 from torch.utils.data.dataset import Dataset
 import urllib
-import os
 import zipfile
-import json
-import codecs
-from random import shuffle
-import math
-import pickle
-from datetime import datetime
 import os
 import codecs
 
@@ -107,7 +100,13 @@ class FileDirectory(Dataset):
         :param idx:
         :return:
         """
-        return self.transform(codecs.open(self.files[idx], 'rb', encoding='utf-8').read())
+        # Truth
+        file_name = self.files[idx]
+
+        # Get class name
+        class_name = file_name[:file_name.find("_")]
+
+        return self.transform(codecs.open(self.files[idx], 'rb', encoding='utf-8').read()), class_name
     # end __getitem__
 
 # end FileDirectory
