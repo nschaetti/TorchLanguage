@@ -111,9 +111,9 @@ class FileDirectory(Dataset):
         class_name = file_name[:file_name.find("_")]
 
         if self.transform is not None:
-            return self.transform(codecs.open(self.files[idx], 'rb', encoding='utf-8').read()), class_name
+            return self.transform(codecs.open(os.path.join(self.root, self.files[idx]), 'rb', encoding='utf-8').read()), class_name
         else:
-            return codecs.open(self.files[idx], 'rb', encoding='utf-8').read(), class_name
+            return codecs.open(os.path.join(self.root, self.files[idx]), 'rb', encoding='utf-8').read(), class_name
         # end if
     # end __getitem__
 
