@@ -103,17 +103,16 @@ class FileDirectory(Dataset):
         :param idx:
         :return:
         """
-        print(idx)
         # Truth
         file_name = self.files[idx]
-        print(file_name)
+
         # Get class name
         class_name = file_name[:file_name.find("_")]
 
         if self.transform is not None:
-            return self.transform(codecs.open(os.path.join(self.root, self.files[idx]), 'rb', encoding='utf-8').read()), class_name
+            return self.transform(codecs.open(os.path.join(self.root, self.files[idx]), 'rb', encoding='utf-8').read()), class_name[0]
         else:
-            return codecs.open(os.path.join(self.root, self.files[idx]), 'rb', encoding='utf-8').read(), class_name
+            return codecs.open(os.path.join(self.root, self.files[idx]), 'rb', encoding='utf-8').read(), class_name[0]
         # end if
     # end __getitem__
 
