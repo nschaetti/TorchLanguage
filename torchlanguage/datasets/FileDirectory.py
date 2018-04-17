@@ -40,6 +40,7 @@ class FileDirectory(Dataset):
 
         # List file
         self.files = os.listdir(root)
+        print(self.files)
     # end __init__
 
     #############################################
