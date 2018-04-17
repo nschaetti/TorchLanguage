@@ -33,7 +33,7 @@ for k in range(10):
     for data in train_dataset:
         # Inputs and outputs
         inputs, label = data
-        print(label[0])
+        print(label)
     # end for
     print(u"")
     print(u"Test")
@@ -41,7 +41,7 @@ for k in range(10):
     for data in test_dataset:
         # Inputs and outputs
         inputs, label = data
-        print(label[0])
+        print(label)
     # end for
     print(u"")
     print(u"")
