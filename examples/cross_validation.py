@@ -6,6 +6,9 @@ import torchlanguage.datasets
 from torch.utils.data.dataloader import DataLoader
 
 
+# Fold
+k = 5
+
 # Transformer
 transformer = torchlanguage.transforms.Compose([
     torchlanguage.transforms.Token(),
@@ -20,32 +23,29 @@ dataset = torchlanguage.datasets.FileDirectory(
 )
 
 # Cross validation
-train_dataset = torchlanguage.utils.CrossValidation(dataset)
-test_dataset = torchlanguage.utils.CrossValidation(dataset, train=False)
+cross_val_dataset = {'train': torchlanguage.utils.CrossValidation(dataset, k=k),
+                     'test': torchlanguage.utils.CrossValidation(dataset, k=k, train=False)}
 
 # Data loader
 data_loader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=2)
 
 # For each fold
-for k in range(10):
-    print(u"Training")
+for k in range(k):
     # Training set
-    for data in train_dataset:
+    for data in cross_val_dataset['train']:
         # Inputs and outputs
         inputs, label = data
         print(label)
     # end for
-    print(u"")
-    print(u"Test")
+
     # Test set
-    for data in test_dataset:
+    for data in cross_val_dataset['test']:
         # Inputs and outputs
         inputs, label = data
         print(label)
     # end for
-    print(u"")
-    print(u"")
+
     # Next fold
-    train_dataset.next_fold()
-    test_dataset.next_fold()
+    cross_val_dataset['train'].next_fold()
+    cross_val_dataset['test'].next_fold()
 # end for
