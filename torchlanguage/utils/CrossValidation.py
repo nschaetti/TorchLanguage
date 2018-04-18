@@ -26,8 +26,7 @@ class CrossValidation(Dataset):
         self.k = k
         self.train = train
         self.fold = fold
-        self.indexes = np.arange(0, len(dataset))
-        self.fold_length = int(math.floor(len(dataset) / k))
+        self.folds, self.fold_sizes, self.indexes = self._create_folds(self.k)
     # end __init__
 
     ###################################
@@ -44,6 +43,43 @@ class CrossValidation(Dataset):
     # end next_fold
 
     ###################################
+    # PRIVATE
+    ###################################
+
+    # Create folds
+    def _create_folds(self, k):
+        """
+        Create folds
+        :param indexes:
+        :return:
+        """
+        # Indexes
+        indexes = np.arange(0, len(self.dataset))
+
+        # Dataset length
+        length = len(indexes)
+
+        # Division and rest
+        division = int(math.floor(length / k))
+        reste = length - division * k
+        reste_size = k - reste
+
+        # Folds size
+        fold_sizes = [division+1] * (reste) + [division] * (reste_size)
+
+        # Folds
+        folds = list()
+        start = 0
+        for i in range(k):
+            folds.append(indexes[start:start+fold_sizes[i]])
+            start += fold_sizes[i]
+        # end for
+
+        return folds, fold_sizes, indexes
+    # end _create_folds
+
+
+    ###################################
     # OVERRIDE
     ###################################
 
@@ -53,10 +89,13 @@ class CrossValidation(Dataset):
         Dataset size
         :return:
         """
+        # Test length
+        test_length = self.fold_sizes[self.fold]
+
         if self.train:
-            return self.fold_length * (self.k - 1)
+            return len(self.dataset) - test_length
         else:
-            return self.fold_length
+            return test_length
         # end if
     # end __len__
 
@@ -68,9 +107,9 @@ class CrossValidation(Dataset):
         :return:
         """
         # Get target set
-        start_index = self.fold * self.k
-        test_set = self.indexes[start_index:start_index+self.fold_length]
-        train_set = np.delete(self.indexes, test_set)
+        test_set = self.folds[self.fold]
+        indexes_copy = self.indexes.copy()
+        train_set = np.delete(indexes_copy, test_set)
 
         # Train/test
         if self.train:
