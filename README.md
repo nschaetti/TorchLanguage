@@ -3,24 +3,24 @@
 --------------------------------------------------------------------------------
 TorchLanguage is the equivalent of TorchVision for Natural Language Processing. It gives you access to text transformers (tokens, index, n-grams, etc) and data sets.
 
-.. image:: https://www.travis-ci.org/nschaetti/TorchLanguage.svg?branch=master
-    :target: https://www.travis-ci.org/nschaetti/TorchLanguage
+<a href="https://twitter.com/intent/tweet?text=TorchLanguage%20is%20the%20equivalent%20of%20TorchVision%20for%20Natural%20Language%20Processing.%20It%20gives%20you%20access%20to%20text%20transformers%20and%20datasets.&url=https://github.com/nschaetti/TorchLanguage&hashtags=pytorch,nlp,research">
+    <img style='vertical-align: text-bottom !important;' src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" alt="Tweet">
+  </a>
 
-.. image:: https://codecov.io/nschaetti/torchlanguage/text/branch/master/graph/badge.svg
-    :target: https://codecov.io/nschaetti/torchlanguage/text
-
-.. image:: https://readthedocs.org/projects/torchlanguage/badge/?version=latest
-    :target: http://torchlanguage.readthedocs.io/en/latest/?badge=latest
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/torchlanguage.svg?style=flat-square)
+[![Codecov](https://img.shields.io/codecov/c/github/nschaetti/torchlanguage/master.svg?style=flat-square)](https://codecov.io/gh/nschaetti/TorchLanguage)
+[![Documentation Status](	https://img.shields.io/readthedocs/torchlanguage/latest.svg?style=flat-square)](http://torchlanguage.readthedocs.io/en/latest/?badge=latest&style=flat-square)
+[![Build Status](https://img.shields.io/travis/nschaetti/TorchLanguage/master.svg?style=flat-square)](https://travis-ci.org/nschaetti/TorchLanguage)
 
 torchlanguage
 +++++++++
 
 This repository consists of:
 
-* `torchlanguage.datasets <#datasets>`_: Pre-built datasets for common NLP tasks
-* `torchlanguage.model <#models>` _: Generic pretrained models for common NLP tasks
-* `torchlanguage.transforms <#transforms>` _: Common transformation for text
-* `torchlanguage.utils <#tools>` _: Tools, functions and measures for NLP
+* `torchlanguage.datasets : Pre-built datasets for common NLP tasks
+* `torchlanguage.model : Generic pretrained models for common NLP tasks
+* `torchlanguage.transforms : Common transformation for text
+* `torchlanguage.utils : Tools, functions and measures for NLP
 
 Installation
 ============
