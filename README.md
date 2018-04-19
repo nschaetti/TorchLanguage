@@ -130,7 +130,7 @@ EchoTorch is a Python framework to easily implement Reservoir Computing models w
 
 ## Citing
 
-If you find PyTorch-NLP useful for an academic publication, then please use the following BibTeX to cite it:
+If you find TorchLanguage useful for an academic publication, then please use the following BibTeX to cite it:
 
 ```
 @misc{torchlanguage,
