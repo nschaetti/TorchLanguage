@@ -59,22 +59,20 @@ dataset = torchlanguage.datasets.FileDirectory(
 
 * Wrapper for dataset splits (train, validation) and cross-validation:
 
-  .. code-block:: python
-
-      >>> TEXT = data.Field()
-      >>> LABELS = data.Field()
-      >>> cross_val_dataset = {'train': torchlanguage.utils.CrossValidation(dataset, k=k),
-      ...     'test': torchlanguage.utils.CrossValidation(dataset, k=k, train=False)}
-      >>> for k in range(k):
-      >>>     for data in cross_val_dataset['train']:
-      >>>         inputs, label = data
-      >>>     # end for
-      >>>     for data in cross_val_dataset['test']:
-      >>>         inputs, label = data
-      >>>     # end for
-      >>>     cross_val_dataset['train'].next_fold()
-      >>>     cross_val_dataset['test'].next_fold()
-      >>> # end for
+```python
+cross_val_dataset = {'train': torchlanguage.utils.CrossValidation(dataset, k=k),
+    'test': torchlanguage.utils.CrossValidation(dataset, k=k, train=False)}
+for k in range(k):
+    for data in cross_val_dataset['train']:
+        inputs, label = data
+    # end for
+    for data in cross_val_dataset['test']:
+        inputs, label = data
+    # end for
+    cross_val_dataset['train'].next_fold()
+    cross_val_dataset['test'].next_fold()
+# end for
+```
 
 Datasets
 ========
