@@ -123,3 +123,28 @@ Others are planned or a work in progress:
 * Question answering
 
 See the ``examples`` directory for examples of dataset usage.
+
+## Related Work
+
+### [echotorch](https://github.com/nschaetti/echotorch)
+
+EchoTorch is a Python framework to easily implement Reservoir Computing models with pyTorch.
+
+## Authors
+
+* [Nils Schaetti](https://github.com/nschaetti/) — Developer
+
+## Citing
+
+If you find PyTorch-NLP useful for an academic publication, then please use the following BibTeX to cite it:
+
+```
+@misc{torchlanguage,
+  author = {Schaetti, Nils},
+  title = {TorchLanguage: Natural Language Processing with pyTorch},
+  year = {2018},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/nschaetti/TorchLanguage}},
+}
+```
