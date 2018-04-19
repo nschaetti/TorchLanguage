@@ -49,14 +49,13 @@ The data module provides the following:
 
 * Ability to download and load a corpus from a directory. The file must be name Class_Title.txt:
 
-  .. code-block:: python
-
-      >>> dataset = torchlanguage.datasets.FileDirectory(
-      ...    root='./data',
-      ...    download=True,
-      ...    download_url="http://urltozip/file.zip",
-      ...    transform=transformer
-      ...    )
+```python
+dataset = torchlanguage.datasets.FileDirectory(
+    root='./data',
+    download=True,
+    download_url="http://urltozip/file.zip",
+    transform=transformer
+```
 
 * Wrapper for dataset splits (train, validation) and cross-validation:
 
