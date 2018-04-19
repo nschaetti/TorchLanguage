@@ -17,7 +17,7 @@ Join our community to create datasets and deep-learning models! Chat with us on 
 This repository consists of:
 
 * torchlanguage.datasets : Pre-built datasets for common NLP tasks
-* torchlanguage.model : Generic pretrained models for common NLP tasks
+* torchlanguage.models : Generic pretrained models for common NLP tasks
 * torchlanguage.transforms : Common transformation for text
 * torchlanguage.utils : Tools, functions and measures for NLP
 
