@@ -7,6 +7,8 @@ TorchLanguage is the equivalent of TorchVision for Natural Language Processing. 
     <img style='vertical-align: text-bottom !important;' src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" alt="Tweet">
   </a>
 
+Join our community to create datasets and deep-learning models! Chat with us on [Gitter](https://gitter.im/TorchLanguage/Lobby) and join the [Google Group](https://groups.google.com/forum/#!forum/torchlanguage/) to collaborate with us.
+
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/torchlanguage.svg?style=flat-square)
 [![Codecov](https://img.shields.io/codecov/c/github/nschaetti/torchlanguage/master.svg?style=flat-square)](https://codecov.io/gh/nschaetti/TorchLanguage)
 [![Documentation Status](	https://img.shields.io/readthedocs/torchlanguage/latest.svg?style=flat-square)](http://torchlanguage.readthedocs.io/en/latest/?badge=latest&style=flat-square)
@@ -17,10 +19,10 @@ torchlanguage
 
 This repository consists of:
 
-* `torchlanguage.datasets : Pre-built datasets for common NLP tasks
-* `torchlanguage.model : Generic pretrained models for common NLP tasks
-* `torchlanguage.transforms : Common transformation for text
-* `torchlanguage.utils : Tools, functions and measures for NLP
+* torchlanguage.datasets : Pre-built datasets for common NLP tasks
+* torchlanguage.model : Generic pretrained models for common NLP tasks
+* torchlanguage.transforms : Common transformation for text
+* torchlanguage.utils : Tools, functions and measures for NLP
 
 Installation
 ============
@@ -36,11 +38,6 @@ If you want to use English tokenizer from `SpaCy <http://spacy.io/>`_, you need 
 
     pip install spacy
     python -m spacy download en
-
-Alternatively, you might want to use Moses tokenizer from `NLTK <http://nltk.org/>`_. You have to install NLTK and download the data needed::
-
-    pip install nltk
-    python -m nltk.downloader perluniprops nonbreaking_prefixes
 
 Text transformation pipeline
 ============================
