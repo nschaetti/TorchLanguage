@@ -14,9 +14,6 @@ Join our community to create datasets and deep-learning models! Chat with us on 
 [![Documentation Status](	https://img.shields.io/readthedocs/torchlanguage/latest.svg?style=flat-square)](http://torchlanguage.readthedocs.io/en/latest/?badge=latest&style=flat-square)
 [![Build Status](https://img.shields.io/travis/nschaetti/TorchLanguage/master.svg?style=flat-square)](https://travis-ci.org/nschaetti/TorchLanguage)
 
-torchlanguage
-+++++++++
-
 This repository consists of:
 
 * torchlanguage.datasets : Pre-built datasets for common NLP tasks
