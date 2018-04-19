@@ -26,7 +26,7 @@ Installation
 
 Make sure you have Python 2.7 or 3.5+ and PyTorch 0.2.0 or newer. You can then install torchlanguage using pip::
 
-    pip install torchlanguage
+    pip install TorchLanguage
 
 Optional requirements
 ---------------------
