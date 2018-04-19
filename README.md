@@ -42,6 +42,39 @@ Alternatively, you might want to use Moses tokenizer from `NLTK <http://nltk.org
     pip install nltk
     python -m nltk.downloader perluniprops nonbreaking_prefixes
 
+Text transformation pipeline
+============================
+
+The following transformation are available :
+
+* Character
+* Character2Gram
+* Character3Gram
+* Compose
+* DropOut
+* Embedding
+* FunctionWord
+* GensimModel
+* GloveVector
+* HorizontalStack
+* MaxIndex
+* PartOfSpeech
+* RandomSamples
+* RemoveCharacter
+* RemoveLines
+* RemoveRegex
+* Tag
+* ToFrequencyVector
+* ToIndex
+* Token
+* ToLength
+* ToLower
+* ToNGram
+* ToOneHot
+* ToUpper
+* Transformer
+* VerticalStack
+
 Data
 ====
 
@@ -55,6 +88,7 @@ dataset = torchlanguage.datasets.FileDirectory(
     download=True,
     download_url="http://urltozip/file.zip",
     transform=transformer
+   )
 ```
 
 * Wrapper for dataset splits (train, validation) and cross-validation:
