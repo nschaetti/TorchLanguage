@@ -2,6 +2,7 @@
 #
 
 # Imports
+import echotorch.nn
 
 
 # Transform input vectors with feature selector
@@ -11,28 +12,20 @@ class FeatureSelector(object):
     """
 
     # Constructor
-    def __init__(self, model):
+    def __init__(self, model, remove_last_layer=True):
         """
         Constructor
         :param model: Feature selection model.
         """
         # Properties
         self.model = model
+        self.input_dim = self.model.fc.out_features
+
+        # Remove last layer
+        if remove_last_layer:
+            self.model.fc = echotorch.nn.Identity()
+        # end if
     # end __init__
-
-    ##############################################
-    # Properties
-    ##############################################
-
-    # Get the number of inputs
-    @property
-    def input_dim(self):
-        """
-        Get the number of inputs.
-        :return: The input size.
-        """
-        return self.model.fc.out_features
-    # end input_dim
 
     ##############################################
     # Override
