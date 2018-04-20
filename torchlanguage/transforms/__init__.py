@@ -15,6 +15,7 @@ from .GloveVector import GloveVector
 from .HorizontalStack import HorizontalStack
 from .MaxIndex import MaxIndex
 from .Normalize import Normalize
+from .NormalizeDim import NormalizeDim
 from .PartOfSpeech import PartOfSpeech
 from .RandomSamples import RandomSamples
 from .RemoveCharacter import RemoveCharacter
@@ -37,6 +38,6 @@ from .VerticalStack import VerticalStack
 __all__ = [
     'Character', 'Character2Gram', 'Character3Gram', 'Compose', 'DropOut', 'Embedding', 'FeatureSelector',
     'FunctionWord', 'GensimModel', 'Transformer', 'GloveVector', 'HorizontalStack', 'MaxIndex', 'Normalize',
-    'PartOfSpeech', 'RemoveCharacter', 'RemoveLines', 'RemoveRegex', 'Reshape', 'Statistics', 'Tag',
+    'NormalizeDim', 'PartOfSpeech', 'RemoveCharacter', 'RemoveLines', 'RemoveRegex', 'Reshape', 'Statistics', 'Tag',
     'ToFrequencyVector', 'ToIndex', 'Token', 'ToLength', 'ToLower', 'ToNGram', 'ToOneHot', 'ToUpper', 'VerticalStack'
 ]
