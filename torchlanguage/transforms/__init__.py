@@ -8,6 +8,7 @@ from .Character3Gram import Character3Gram
 from .Compose import Compose
 from .DropOut import DropOut
 from .Embedding import Embedding
+from .FeatureSelector import FeatureSelector
 from .FunctionWord import FunctionWord
 from .GensimModel import GensimModel
 from .GloveVector import GloveVector
@@ -18,6 +19,7 @@ from .RandomSamples import RandomSamples
 from .RemoveCharacter import RemoveCharacter
 from .RemoveLines import RemoveLines
 from .RemoveRegex import RemoveRegex
+from .Reshape import Reshape
 from .Tag import Tag
 from .ToFrequencyVector import ToFrequencyVector
 from .ToIndex import ToIndex
@@ -31,8 +33,8 @@ from .Transformer import Transformer
 from .VerticalStack import VerticalStack
 
 __all__ = [
-    'Character', 'Character2Gram', 'Character3Gram', 'Compose', 'DropOut', 'Embedding', 'FunctionWord', 'GensimModel',
-    'Transformer', 'GloveVector', 'HorizontalStack', 'MaxIndex', 'PartOfSpeech', 'RemoveCharacter', 'RemoveLines',
-    'RemoveRegex', 'Tag', 'ToFrequencyVector', 'ToIndex', 'Token', 'ToLength', 'ToLower', 'ToNGram', 'ToOneHot',
-    'ToUpper', 'VerticalStack'
+    'Character', 'Character2Gram', 'Character3Gram', 'Compose', 'DropOut', 'Embedding', 'FeatureSelector',
+    'FunctionWord', 'GensimModel', 'Transformer', 'GloveVector', 'HorizontalStack', 'MaxIndex', 'PartOfSpeech',
+    'RemoveCharacter', 'RemoveLines', 'RemoveRegex', 'Reshape', 'Tag', 'ToFrequencyVector', 'ToIndex', 'Token',
+    'ToLength', 'ToLower', 'ToNGram', 'ToOneHot', 'ToUpper', 'VerticalStack'
 ]
