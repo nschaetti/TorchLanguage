@@ -18,11 +18,11 @@ class Character2Gram(Transformer):
         """
         Constructor
         """
-        # Properties
-        self.overlapse = overlapse
-
         # Super constructor
         super(Character2Gram, self).__init__()
+
+        # Properties
+        self.overlapse = overlapse
     # end __init__
 
     ##############################################

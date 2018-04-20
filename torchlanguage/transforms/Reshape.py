@@ -3,10 +3,11 @@
 
 # Imports
 import echotorch.nn
+from .Transformer import Transformer
 
 
 # Reshape input tensor
-class Reshape(object):
+class Reshape(Transformer):
     """
     Reshape input tensor
     """
@@ -17,6 +18,9 @@ class Reshape(object):
         Constructor
         :param model: Feature selection model.
         """
+        # Super constructor
+        super(Reshape, self).__init__()
+
         # Properties
         self.view = view
     # end __init__

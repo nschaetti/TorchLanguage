@@ -3,13 +3,13 @@
 
 # Imports
 import gensim
-from gensim.utils import tokenize
 import torch
 import numpy as np
+from .Transformer import Transformer
 
 
 # Transform text to vectors with embedding
-class Embedding(object):
+class Embedding(Transformer):
     """
     Transform text to vectors with embedding
     """
@@ -20,6 +20,9 @@ class Embedding(object):
         Constructor
         :param weights: Embedding weight matrix
         """
+        # Super constructor
+        super(Embedding, self).__init__()
+
         # Properties
         self.weights = embedding.weights
         self.voc_size = embedding.voc_size

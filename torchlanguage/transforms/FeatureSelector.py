@@ -2,12 +2,12 @@
 #
 
 # Imports
-import echotorch.nn
 from torch.autograd import Variable
+from .Transformer import Transformer
 
 
 # Transform input vectors with feature selector
-class FeatureSelector(object):
+class FeatureSelector(Transformer):
     """
     Transform input vectors with feature selector
     """
@@ -18,11 +18,28 @@ class FeatureSelector(object):
         Constructor
         :param model: Feature selection model.
         """
+        # Super constructor
+        super(FeatureSelector, self).__init__()
+
         # Properties
         self.model = model
-        self.input_dim = n_features
+        self.input_size = n_features
         self.to_variable = to_variable
     # end __init__
+
+    ##############################################
+    # Properties
+    ##############################################
+
+    # Get the number of inputs
+    @property
+    def input_dim(self):
+        """
+        Get the number of inputs.
+        :return: The input size.
+        """
+        return self.input_size
+    # end input_dim
 
     ##############################################
     # Override

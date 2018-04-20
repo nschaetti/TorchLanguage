@@ -3,10 +3,11 @@
 
 # Imports
 import torch
+from .Transformer import Transformer
 
 
 # Transform idxs tensor to frequency vector
-class ToFrequencyVector(object):
+class ToFrequencyVector(Transformer):
     """
     Transform idxs tensor to frequency vector
     """
@@ -17,6 +18,9 @@ class ToFrequencyVector(object):
         Constructor
         :param voc_size: Number of tokens in the vocabulary
         """
+        # Super constructor
+        super(ToFrequencyVector, self).__init__()
+
         # Properties
         self.voc_size = voc_size
     # end __init__

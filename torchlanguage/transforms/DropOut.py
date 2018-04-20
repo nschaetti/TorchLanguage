@@ -3,10 +3,11 @@
 
 # Imports
 import torch
+from .Transformer import Transformer
 
 
 # Replace an index or a vector by zero or a given value with a given probability
-class DropOut(object):
+class DropOut(Transformer):
     """
     Replace an index or a vector by zero or a given value with a given probability
     """
@@ -17,6 +18,9 @@ class DropOut(object):
         Constructor
         :param prob:
         """
+        # Super constructor
+        super(DropOut, self).__init__()
+
         # Properties
         self.prob = prob
         self.replace_by = replace_by

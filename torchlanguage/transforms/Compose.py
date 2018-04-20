@@ -28,6 +28,74 @@ class Compose(Transformer):
     ##############################################
 
     ##############################################
+    # Private
+    ##############################################
+
+    # Get to str for sub transforms
+    def _transforms_str(self):
+        """
+        Get to str for sub transforms
+        :return:
+        """
+        # String
+        final_str = ""
+
+        # For each transforms
+        for trans in self.transforms:
+            # Trans string
+            tran_str = str(trans)
+
+            # Add tab
+            tran_str = "\t" + tran_str
+
+            # Add tab to lines
+            tran_str = tran_str.replace("\n", "\n\t")
+
+            # Add
+            final_str += tran_str + "\n"
+        # end for
+
+        # Remove final \n
+        if final_str[-1] == "\n":
+            final_str = final_str[:-1]
+        # end if
+
+        return final_str
+    # end _transforms_str
+
+    # Get to unicode for sub transforms
+    def _transforms_unicode(self):
+        """
+        Get to unicode for sub transforms
+        :return:
+        """
+        # String
+        final_str = u""
+
+        # For each transforms
+        for trans in self.transforms:
+            # Trans string
+            tran_str = unicode(trans)
+
+            # Add tab
+            tran_str = u"\t" + tran_str
+
+            # Add tab to lines
+            tran_str = tran_str.replace(u"\n", u"\n\t")
+
+            # Add
+            final_str += tran_str + u"\n"
+        # end for
+
+        # Remove final \n
+        if final_str[-1] == u"\n":
+            final_str = final_str[:-1]
+        # end if
+
+        return final_str
+    # end _transforms_unicode
+
+    ##############################################
     # Properties
     ##############################################
 
@@ -64,5 +132,24 @@ class Compose(Transformer):
 
         return outputs
     # end convert
+
+    # String
+    def __str__(self):
+        """
+        String
+        :return:
+        """
+        return "Compose (\n{}\n)".format(self._transforms_str())
+
+    # end __str__
+
+    # Unicode
+    def __unicode__(self):
+        """
+        Unicode
+        :return:
+        """
+        return u"Compose (\n{}\n)".format(self._transforms_unicode())
+    # end __unicode__
 
 # end Compose

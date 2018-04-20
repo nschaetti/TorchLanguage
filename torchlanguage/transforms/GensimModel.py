@@ -3,13 +3,13 @@
 
 # Imports
 import gensim
-from gensim.utils import tokenize
 import torch
 import numpy as np
+from .Transformer import Transformer
 
 
 # Transform text to vectors with a Gensim model
-class GensimModel(object):
+class GensimModel(Transformer):
     """
     Transform text to vectors with a Gensim model
     """
@@ -20,6 +20,9 @@ class GensimModel(object):
         Constructor
         :param model_path: Model's path.
         """
+        # Super constructor
+        super(GensimModel, self).__init__()
+
         # Properties
         self.model_path = model_path
 

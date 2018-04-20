@@ -5,11 +5,11 @@
 import torch
 import spacy
 import numpy as np
-from datetime import datetime
+from .Transformer import Transformer
 
 
 # Transform text to word vectors
-class GloveVector(object):
+class GloveVector(Transformer):
     """
     Transform text to word vectors
     """
@@ -20,6 +20,9 @@ class GloveVector(object):
         Constructor
         :param model: Spacy's model to load.
         """
+        # Super constructor
+        super(GloveVector, self).__init__()
+
         # Properties
         self.model = model
         self.nlp = spacy.load(model)

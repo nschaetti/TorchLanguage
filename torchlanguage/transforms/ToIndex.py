@@ -3,10 +3,11 @@
 
 # Imports
 import torch
+from .Transformer import Transformer
 
 
 # Transform tokens to index
-class ToIndex(object):
+class ToIndex(Transformer):
     """
     Transform tokens to index
     """
@@ -17,6 +18,9 @@ class ToIndex(object):
         Constructor
         :param model: Spacy's model to load.
         """
+        # Super constructor
+        super(ToIndex, self).__init__()
+
         # Gram to ix
         if token_to_ix is not None:
             self.token_count = len(token_to_ix.keys())

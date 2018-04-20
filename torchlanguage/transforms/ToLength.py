@@ -3,10 +3,11 @@
 
 # Imports
 import torch
+from .Transformer import Transformer
 
 
 # Set the input to a fixed length, truncate the tensor or extend it with zeros
-class ToLength(object):
+class ToLength(Transformer):
     """
     Set the input to a fixed length, truncate the tensor or extend it with zeros
     """
@@ -17,6 +18,9 @@ class ToLength(object):
         Constructor
         :param length: Fixed length
         """
+        # Super constructor
+        super(ToLength, self).__init__()
+
         # Properties
         self.length = length
         self.input_dim = 1

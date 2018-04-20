@@ -3,10 +3,11 @@
 
 # Imports
 import spacy
+from .Transformer import Transformer
 
 
 # Transform text to a list of tokens
-class Token(object):
+class Token(Transformer):
     """
     Transform text to a list of tokens
     """
@@ -17,6 +18,9 @@ class Token(object):
         Constructor
         :param model: Spacy's model to load.
         """
+        # Upper
+        super(Token, self).__init__()
+
         # Properties
         self.model = model
         self.nlp = spacy.load(model)

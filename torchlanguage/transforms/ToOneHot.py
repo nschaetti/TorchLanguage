@@ -3,10 +3,11 @@
 
 # Imports
 import torch
+from .Transformer import Transformer
 
 
 # Transform index to one-hot vector
-class ToOneHot(object):
+class ToOneHot(Transformer):
     """
     Transform tokens to one-hot vector
     """
@@ -17,6 +18,9 @@ class ToOneHot(object):
         Constructor
         :param voc_size: Vocabulary size
         """
+        # Super constructor
+        super(ToOneHot, self).__init__()
+
         # Properties
         self.voc_size = voc_size
     # end __init__
