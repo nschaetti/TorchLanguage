@@ -3,6 +3,7 @@
 
 # Imports
 import echotorch.nn
+from torch.autograd import Variable
 
 
 # Transform input vectors with feature selector
@@ -12,19 +13,15 @@ class FeatureSelector(object):
     """
 
     # Constructor
-    def __init__(self, model, remove_last_layer=True):
+    def __init__(self, model, n_features, to_variable=False):
         """
         Constructor
         :param model: Feature selection model.
         """
         # Properties
         self.model = model
-        self.input_dim = self.model.fc.out_features
-
-        # Remove last layer
-        if remove_last_layer:
-            self.model.fc = echotorch.nn.Identity()
-        # end if
+        self.input_dim = n_features
+        self.to_variable = to_variable
     # end __init__
 
     ##############################################
@@ -52,7 +49,12 @@ class FeatureSelector(object):
         :param text:
         :return:
         """
-        return self.model(x)
+        if self.to_variable:
+            transformed = self.model(Variable(x))
+            return transformed.data
+        else:
+            return self.model(x)
+        # end if
     # end _transform
 
 # end FeatureSelector
