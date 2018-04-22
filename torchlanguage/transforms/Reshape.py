@@ -26,6 +26,20 @@ class Reshape(Transformer):
     # end __init__
 
     ##############################################
+    # Properties
+    ##############################################
+
+    # Get the number of inputs
+    @property
+    def input_dim(self):
+        """
+        Get the number of inputs.
+        :return: The input size.
+        """
+        return self.view[-1]
+    # end input_dim
+
+    ##############################################
     # Override
     ##############################################
 
