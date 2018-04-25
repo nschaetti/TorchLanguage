@@ -71,9 +71,9 @@ class ToLength(Transformer):
             # Tensor type
             tensor_type = x.__class__
             if self.input_dim > 0:
-                return tensor_type(1, self.length, x.size(1))
+                return tensor_type(1, self.length, x.size(1)).fill_(0)
             else:
-                return tensor_type(1, self.length)
+                return tensor_type(1, self.length).fill_(0)
             # end if
         # end if
 
