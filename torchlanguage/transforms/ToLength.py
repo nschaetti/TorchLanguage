@@ -13,7 +13,7 @@ class ToLength(Transformer):
     """
 
     # Constructor
-    def __init__(self, length):
+    def __init__(self, length, input_dim=0):
         """
         Constructor
         :param length: Fixed length
@@ -23,8 +23,22 @@ class ToLength(Transformer):
 
         # Properties
         self.length = length
-        self.input_dim = 1
+        self.input_size = input_dim
     # end __init__
+
+    ##############################################
+    # Properties
+    ##############################################
+
+    # Get the number of inputs
+    @property
+    def input_dim(self):
+        """
+        Get the number of inputs.
+        :return: The input size.
+        """
+        return self.input_size
+    # end input_dim
 
     ##############################################
     # Override
@@ -54,7 +68,13 @@ class ToLength(Transformer):
                 # end if
             # end for
         else:
-            return x
+            # Tensor type
+            tensor_type = x.__class__
+            if self.input_dim > 0:
+                return tensor_type(1, self.length, x.size(1))
+            else:
+                return tensor_type(1, self.length)
+            # end if
         # end if
 
         return result
