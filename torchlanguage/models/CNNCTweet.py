@@ -5,6 +5,29 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.utils.model_zoo as model_zoo
+
+
+__all__ = ['CNNCTweet', 'cnnctweet']
+
+
+# Model URLs
+model_urls = {
+    'cnnctweet': {
+        'en': 'https://www.nilsschaetti.com/models/cnnctweet-en-bd63e232.pth',
+        'es': 'https://www.nilsschaetti.com/models/cnnctweet-es-4df8aa71.pth',
+        'ar': 'https://www.nilsschaetti.com/models/cnnctweet-ar-4df8aa71.pth'
+    }
+}
+
+# Voc URLs
+voc_urls = {
+    'cnnctweet': {
+        'en': 'https://www.nilsschaetti.com/models/cnnctweet-voc-en-bd63e232.pth',
+        'es': 'https://www.nilsschaetti.com/models/cnnctweet-voc-es-4df8aa71.pth',
+        'ar': 'https://www.nilsschaetti.com/models/cnnctweet-voc-ar-4df8aa71.pth'
+    }
+}
 
 
 # CNNC-Tweet (Text)
@@ -96,3 +119,22 @@ class CNNCTweet(nn.Module):
     # end forward
 
 # end CNNCTweet
+
+
+# Load model
+def cnnctweet(pretrained=False, lang='en', **kwargs):
+    """
+    Load model
+    :param pretrained:
+    :param lang:
+    :param kwargs:
+    :return:
+    """
+    model = CNNCTweet(**kwargs)
+    voc = dict()
+    if pretrained:
+        model.load_state_dict(model_zoo.load_url(model_urls['cgfs'][lang]))
+        voc = model_zoo.load_url(voc_urls['cgfs'][lang])
+    # end if
+    return model, voc
+# end cnnctweet
