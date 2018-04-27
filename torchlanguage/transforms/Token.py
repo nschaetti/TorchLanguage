@@ -3,6 +3,7 @@
 
 # Imports
 import spacy
+import nltk
 from .Transformer import Transformer
 
 
@@ -13,7 +14,7 @@ class Token(Transformer):
     """
 
     # Constructor
-    def __init__(self, model="en_core_web_lg"):
+    def __init__(self, model="en_core_web_lg", lang='en'):
         """
         Constructor
         :param model: Spacy's model to load.
@@ -22,8 +23,11 @@ class Token(Transformer):
         super(Token, self).__init__()
 
         # Properties
+        self.lang = lang
         self.model = model
-        self.nlp = spacy.load(model)
+        if model != 'nltk':
+            self.nlp = spacy.load(model)
+        # end if
     # end __init__
 
     ##############################################
@@ -55,9 +59,15 @@ class Token(Transformer):
         tokens = list()
 
         # For each tokens
-        for token in self.nlp(text):
-            tokens.append(unicode(token.text))
-        # end for
+        if self.model == 'nltk':
+            for token in nltk.word_tokenize(text, language=self.lang):
+                tokens.append(unicode(token))
+            # end for
+        else:
+            for token in self.nlp(text):
+                tokens.append(unicode(token.text))
+            # end for
+        # end if
 
         return tokens
     # end convert
