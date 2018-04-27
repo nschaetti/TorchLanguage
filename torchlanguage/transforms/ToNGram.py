@@ -91,7 +91,7 @@ class ToNGram(Transformer):
         # Step
         if self.overlapse:
             step = 1
-            last = 1
+            last = self.n
         else:
             step = self.n
             last = self.n - 1
