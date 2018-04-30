@@ -3,10 +3,11 @@
 
 # Imports
 import torch
+from .Transformer import Transformer
 
 
 # Replace index greater than max_id
-class MaxIndex(object):
+class MaxIndex(Transformer):
     """
     Replace index greater than max_id
     """
@@ -18,6 +19,10 @@ class MaxIndex(object):
         :param max_id: Index greater than this value are replaces by replace_by
         :param replace_by: New value for index greater than max_id
         """
+        # Super constructor
+        super(MaxIndex, self).__init__()
+
+        # Properties
         self.max_id = max_id
         self.replace_by = replace_by
     # end __init__

@@ -3,31 +3,33 @@
 
 # Imports
 import torch
-from .Transformer import Transformer
+import spacy
 import numpy as np
+from .Transformer import Transformer
 
 
-# Transform text to character 2-gram
-class Character2Gram(Transformer):
+# Make statistics about words
+class WordFrequencies(Transformer):
     """
-    Transform text to character 2-grams
+    Make statistics about words
     """
 
     # Constructor
-    def __init__(self, overlapse=True):
+    def __init__(self, model="en_vectors_web_lg"):
         """
         Constructor
+        :param model: Spacy's model to load.
         """
         # Super constructor
-        super(Character2Gram, self).__init__()
+        super(WordFrequencies, self).__init__()
 
         # Properties
-        self.overlapse = overlapse
+        self.model = model
+        self.nlp = spacy.load(model)
+        self.token_count = dict()
+        self.token_total = 0
+        self.tokens = list()
     # end __init__
-
-    ##############################################
-    # Public
-    ##############################################
 
     ##############################################
     # Properties
@@ -54,7 +56,6 @@ class Character2Gram(Transformer):
         :param text: Text to convert
         :return: Tensor of word vectors
         """
-        # List of character
         return self._transform(text)
     # end convert
 
@@ -63,23 +64,29 @@ class Character2Gram(Transformer):
     ##############################################
 
     # Transform
-    def _transform(self, x):
+    def _transform(self, text):
         """
         Transform input
-        :param x:
+        :param text:
         :return:
         """
-        # Step
-        if self.overlapse:
-            step = 1
-            last = 1
-        else:
-            step = 2
-            last = 0
-        #  end if
+        # Statistics
+        self.token_count = dict()
+        self.token_total = 0.0
+        self.tokens = list()
 
-        # List of character to 2grams
-        return [x[i:i + 2] for i in np.arange(0, len(x) - last, step)]
+        # For each tokens
+        for token in self.nlp(text):
+            try:
+                self.token_count[token.text] += 1.0
+            except KeyError:
+                self.token_count[token.text] = 1.0
+            # end try
+            self.token_total += 1.0
+            self.tokens.append(token.text)
+        # end for
+
+        return text
     # end _transform
 
-# end Character2Gram
+# end WordFrequencies

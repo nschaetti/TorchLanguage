@@ -23,7 +23,7 @@ class ReutersC50Dataset(Dataset):
 
     # Constructor
     def __init__(self, root='./data', download=False, n_authors=50, dataset_size=100, dataset_start=0, authors=None,
-                 transform=None, train=True, k=10, retain_transform=False, load_transform=False):
+                 transform=None, retain_transform=False, load_transform=False):
         """
         Constructor
         :param root: Data root directory.
@@ -44,16 +44,8 @@ class ReutersC50Dataset(Dataset):
         self.author2id = dict()
         self.id2author = dict()
         self.texts = list()
-        self.train = train
-        self.k = k
-        self.fold = 0
         self.retain_transform = retain_transform
         self.load_transform = load_transform
-
-        # Check path
-        if self.dataset_size * self.n_authors < self.k:
-            self.k = self.dataset_size * self.n_authors
-        # end if
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -72,32 +64,6 @@ class ReutersC50Dataset(Dataset):
     #############################################
     # PUBLIC
     #############################################
-
-    # Set fold
-    def set_fold(self, fold):
-        """
-        Set fold
-        :param fold:
-        :return:
-        """
-        self.fold = fold
-
-        # Select data
-        self._select_data()
-    # end set_fold
-
-    # Set train (true, false)
-    def set_train(self, mode):
-        """
-        Set train (true, false)
-        :param mode:
-        :return:
-        """
-        self.train = mode
-
-        # Select data
-        self._select_data()
-    # end set_train
 
     # Set start
     def set_start(self, start):
@@ -119,7 +85,7 @@ class ReutersC50Dataset(Dataset):
         Length
         :return:
         """
-        return len(self.fold_texts)
+        return len(self.texts)
     # end __len__
 
     # Get item
@@ -130,8 +96,8 @@ class ReutersC50Dataset(Dataset):
         :return:
         """
         # Current file
-        text_path, author_name = self.fold_texts[idx]
-        # print(text_path)
+        text_path, author_name = self.texts[idx]
+
         # Read text
         text_content = codecs.open(text_path, 'r', encoding='utf-8').read()
 
@@ -294,47 +260,6 @@ class ReutersC50Dataset(Dataset):
 
         # Shuffle texts
         shuffle(self.texts)
-
-        # Select data
-        self._select_data()
     # end _load
-
-    # Select data
-    def _select_data(self):
-        """
-        Select data
-        :return:
-        """
-        # Fold size
-        fold_quotient = math.ceil(len(self.texts) / self.k)
-        fold_reste = int(math.ceil((len(self.texts) / float(self.k) - fold_quotient) * 10.0))
-        fold_sizes = [fold_quotient+1]*fold_reste + [fold_quotient]*(self.k - fold_reste)
-
-        # Fold size
-        fold_size = int(fold_sizes[self.fold])
-
-        # Compute starting point
-        starting = 0
-        for i in range(self.fold):
-            starting += int(fold_sizes[i])
-        # end for
-
-        # Test set
-        test_set = self.texts[starting:starting+fold_size]
-
-        # Data texts
-        if not self.train:
-            # Test
-            self.fold_texts = test_set
-        else:
-            # Train
-            self.fold_texts = list(self.texts)
-
-            # Remove test
-            for t in test_set:
-                self.fold_texts.remove(t)
-            # end for
-        # end if
-    # end _select_data
 
 # end ReutersC50Dataset

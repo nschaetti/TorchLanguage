@@ -27,6 +27,7 @@ class FileDirectory(Dataset):
         # Properties
         self.root = root
         self.transform = transform
+        self.download_url = download_url
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -40,7 +41,6 @@ class FileDirectory(Dataset):
 
         # List file
         self.files = os.listdir(root)
-        print(self.files)
     # end __init__
 
     #############################################
@@ -70,7 +70,7 @@ class FileDirectory(Dataset):
         path_to_zip = os.path.join(self.root, "dataset.zip")
 
         # Download
-        urllib.urlretrieve("http://www.nilsschaetti.com/datasets/dataset.zip", path_to_zip)
+        urllib.urlretrieve(self.download_url, path_to_zip)
 
         # Unzip
         zip_ref = zipfile.ZipFile(path_to_zip, 'r')
@@ -101,17 +101,17 @@ class FileDirectory(Dataset):
         :param idx:
         :return:
         """
-        print(idx)
         # Truth
         file_name = self.files[idx]
-        print(file_name)
-        # Get class name
-        class_name = file_name[:file_name.find("_")]
 
+        # Get class name
+        class_name = unicode(file_name[:file_name.find("_")])
+
+        # Transformation
         if self.transform is not None:
-            return self.transform(codecs.open(self.files[idx], 'rb', encoding='utf-8').read()), class_name
+            return self.transform(codecs.open(os.path.join(self.root, self.files[idx]), 'rb', encoding='utf-8').read()), class_name
         else:
-            return codecs.open(self.files[idx], 'rb', encoding='utf-8').read(), class_name
+            return codecs.open(os.path.join(self.root, self.files[idx]), 'rb', encoding='utf-8').read(), class_name
         # end if
     # end __getitem__
 

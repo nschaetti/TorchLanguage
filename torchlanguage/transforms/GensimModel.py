@@ -3,13 +3,13 @@
 
 # Imports
 import gensim
-from gensim.utils import tokenize
 import torch
 import numpy as np
+from .Transformer import Transformer
 
 
 # Transform text to vectors with a Gensim model
-class GensimModel(object):
+class GensimModel(Transformer):
     """
     Transform text to vectors with a Gensim model
     """
@@ -20,6 +20,9 @@ class GensimModel(object):
         Constructor
         :param model_path: Model's path.
         """
+        # Super constructor
+        super(GensimModel, self).__init__()
+
         # Properties
         self.model_path = model_path
 
@@ -57,6 +60,20 @@ class GensimModel(object):
         Convert a string to a ESN input
         :param text: Text to convert
         :return: Tensor of word vectors
+        """
+        return self._transform(tokens).unsqueeze(0)
+    # end convert
+
+    ##############################################
+    # Private
+    ##############################################
+
+    # Transform
+    def _transform(self, tokens):
+        """
+        Transform input
+        :param tokens:
+        :return:
         """
         # Inputs as tensor
         inputs = torch.FloatTensor(1, self.input_dim)
@@ -104,8 +121,6 @@ class GensimModel(object):
         self.oov = zero / count * 100.0
 
         return inputs
-    # end convert
+    # end _transform
 
-    ##############################################
-    # Static
-    #########################################
+# end GensimModel

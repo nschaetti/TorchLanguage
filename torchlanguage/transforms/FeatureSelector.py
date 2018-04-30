@@ -2,32 +2,30 @@
 #
 
 # Imports
-import torch
+from torch.autograd import Variable
 from .Transformer import Transformer
-import numpy as np
 
 
-# Transform text to character 2-gram
-class Character2Gram(Transformer):
+# Transform input vectors with feature selector
+class FeatureSelector(Transformer):
     """
-    Transform text to character 2-grams
+    Transform input vectors with feature selector
     """
 
     # Constructor
-    def __init__(self, overlapse=True):
+    def __init__(self, model, n_features, to_variable=False):
         """
         Constructor
+        :param model: Feature selection model.
         """
         # Super constructor
-        super(Character2Gram, self).__init__()
+        super(FeatureSelector, self).__init__()
 
         # Properties
-        self.overlapse = overlapse
+        self.model = model
+        self.input_size = n_features
+        self.to_variable = to_variable
     # end __init__
-
-    ##############################################
-    # Public
-    ##############################################
 
     ##############################################
     # Properties
@@ -40,7 +38,7 @@ class Character2Gram(Transformer):
         Get the number of inputs.
         :return: The input size.
         """
-        return 1
+        return self.input_size
     # end input_dim
 
     ##############################################
@@ -48,14 +46,13 @@ class Character2Gram(Transformer):
     ##############################################
 
     # Convert a string
-    def __call__(self, text):
+    def __call__(self, x):
         """
         Convert a string to a ESN input
-        :param text: Text to convert
+        :param x: Tensor to transform
         :return: Tensor of word vectors
         """
-        # List of character
-        return self._transform(text)
+        return self._transform(x)
     # end convert
 
     ##############################################
@@ -66,20 +63,15 @@ class Character2Gram(Transformer):
     def _transform(self, x):
         """
         Transform input
-        :param x:
+        :param text:
         :return:
         """
-        # Step
-        if self.overlapse:
-            step = 1
-            last = 1
+        if self.to_variable:
+            transformed = self.model(Variable(x))
+            return transformed.data
         else:
-            step = 2
-            last = 0
-        #  end if
-
-        # List of character to 2grams
-        return [x[i:i + 2] for i in np.arange(0, len(x) - last, step)]
+            return self.model(x)
+        # end if
     # end _transform
 
-# end Character2Gram
+# end FeatureSelector

@@ -3,20 +3,24 @@
 
 # Imports
 import torch
+from .Transformer import Transformer
 
 
 # Transform tokens to index
-class ToIndex(object):
+class ToIndex(Transformer):
     """
     Transform tokens to index
     """
 
     # Constructor
-    def __init__(self, token_to_ix=None, start_ix=0, fixed_length=-1):
+    def __init__(self, token_to_ix=None, start_ix=0):
         """
         Constructor
         :param model: Spacy's model to load.
         """
+        # Super constructor
+        super(ToIndex, self).__init__()
+
         # Gram to ix
         if token_to_ix is not None:
             self.token_count = len(token_to_ix.keys())
@@ -33,9 +37,6 @@ class ToIndex(object):
                 self.ix_to_token[token_to_ix[token]] = token
             # end for
         # end if
-
-        # Properties
-        self.fixed_length = fixed_length
     # end __init__
 
     ##############################################
@@ -91,16 +92,8 @@ class ToIndex(object):
 
         # To long tensor
         text_idxs = torch.LongTensor(text_idxs)
-
-        # Check length
-        if self.fixed_length != -1:
-            if text_idxs.size(0) > self.fixed_length:
-                text_idxs = text_idxs[:self.fixed_length]
-            elif text_idxs.size(0) < self.fixed_length:
-                zero_idxs = torch.LongTensor(self.fixed_length).fill_(0)
-                zero_idxs[:text_idxs.size(0)] = text_idxs
-                text_idxs = zero_idxs
-            # end if
+        if text_idxs.dim() > 0:
+            text_idxs = text_idxs.unsqueeze(0)
         # end if
 
         return text_idxs
