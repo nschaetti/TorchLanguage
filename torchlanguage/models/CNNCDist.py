@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
+import math
 
 
 __all__ = ['CNNCDist', 'cnncdist']
@@ -33,8 +34,8 @@ class CNNCDist(nn.Module):
     """
 
     # Constructor
-    def __init__(self, window_size, vocab_size, embedding_dim=50, out_channels=(500, 500, 500),
-                 kernel_sizes=(3, 4, 5), linear_size=1500):
+    def __init__(self, window_size, vocab_size, n_classes, embedding_dim=50, out_channels=(500, 500, 500),
+                 kernel_sizes=(3, 4, 5), n_linear=2, linear_size=1500, temporal_division=1.0):
         """
         Constructor
         :param vocab_size: Vocabulary size
@@ -48,6 +49,9 @@ class CNNCDist(nn.Module):
         self.embedding_dim = embedding_dim
         self.window_size = window_size
         self.linear_size = linear_size
+        self.n_classes = n_classes
+        self.n_linear = n_linear
+        self.temporal_division = temporal_division
 
         # Embedding layer
         self.embeddings = nn.Embedding(vocab_size, embedding_dim)
@@ -64,15 +68,35 @@ class CNNCDist(nn.Module):
         self.conv_w3 = nn.Conv2d(in_channels=1, out_channels=out_channels[2],
                                  kernel_size=(kernel_sizes[2], embedding_dim))
 
+        # Max pooling sizes
+        self.max_pool1_size = int(math.floor((window_size - kernel_sizes[0] + 1) / temporal_division))
+        self.max_pool2_size = int(math.floor((window_size - kernel_sizes[1] + 1) / temporal_division))
+        self.max_pool3_size = int(math.floor((window_size - kernel_sizes[2] + 1) / temporal_division))
+
+        # Max pooling stride
+        self.stride1 = self.max_pool1_size
+        self.stride2 = self.max_pool2_size
+        self.stride3 = self.max_pool3_size
+
         # Max pooling layer
-        self.max_pool_w1 = nn.MaxPool1d(kernel_size=window_size - kernel_sizes[0] + 1, stride=0)
-        self.max_pool_w2 = nn.MaxPool1d(kernel_size=window_size - kernel_sizes[1] + 1, stride=0)
-        self.max_pool_w3 = nn.MaxPool1d(kernel_size=window_size - kernel_sizes[2] + 1, stride=0)
+        self.max_pool_w1 = nn.MaxPool1d(kernel_size=self.max_pool1_size, stride=self.stride1)
+        self.max_pool_w2 = nn.MaxPool1d(kernel_size=self.max_pool2_size, stride=self.stride2)
+        self.max_pool_w3 = nn.MaxPool1d(kernel_size=self.max_pool3_size, stride=self.stride3)
+
+        # Final max pool size
+        self.final_max_pool_size = (out_channels[0] + out_channels[1] + out_channels[2]) * temporal_division
 
         # Linear layer
-        self.linear_input_dim = (out_channels[0] + out_channels[1] + out_channels[2]) * 2
-        self.linear1 = nn.Linear(self.linear_input_dim, self.linear_size)
-        self.linear2 = nn.Linear(self.linear_size, 1)
+        if self.n_linear == 2:
+            self.linear_input_dim = self.final_max_pool_size * 2
+            self.linear1 = nn.Linear(self.linear_input_dim, self.linear_size)
+            self.linear2 = nn.Linear(self.linear_size, n_classes)
+        elif self.n_linear == 1:
+            self.linear_input_dim = (out_channels[0] + out_channels[1] + out_channels[2]) * 2
+            self.linear1 = nn.Linear(self.linear_input_dim, n_classes)
+        else:
+            raise NotImplementedError(u"More than 2 layers not implemented")
+        # end if
     # end __init__
 
     # Forward for one side
@@ -107,7 +131,7 @@ class CNNCDist(nn.Module):
         out = torch.cat((max_win1, max_win2, max_win3), dim=1)
 
         # Flatten
-        return out.view(-1, self.linear_input_dim / 2)
+        return out.view(-1, self.final_max_pool_size)
     # end forward_side
 
     # Forward
@@ -118,7 +142,7 @@ class CNNCDist(nn.Module):
         :return:
         """
         # Each side
-        x1 = x[:, self.window_size]
+        x1 = x[:, self.window_size:]
         x2 = x[:, :self.window_size]
 
         # CNN on one side
@@ -131,14 +155,16 @@ class CNNCDist(nn.Module):
         # Flatten
         out = out.view(-1, self.linear_input_dim)
 
-        # Linear 1
-        out = F.relu(self.linear1(out))
+        # Linear
+        if self.n_linear == 2:
+            # Linear 1
+            out = F.relu(self.linear1(out))
 
-        # Linear 2
-        out = F.relu(self.linear2(out))
-
-        # Log Softmax
-        return out
+            # Linear 2
+            return self.linear2(out)
+        else:
+            return self.linear1(out)
+        # end if
     # end forward
 
 # end CNNCDist
