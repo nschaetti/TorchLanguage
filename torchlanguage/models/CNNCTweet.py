@@ -11,21 +11,32 @@ import torch.utils.model_zoo as model_zoo
 __all__ = ['CNNCTweet', 'cnnctweet']
 
 
-# Model URLs
-model_urls = {
-    'cnnctweet': {
-        'en': 'https://www.nilsschaetti.com/models/cnnctweet-en-bd63e232.pth',
-        'es': 'https://www.nilsschaetti.com/models/cnnctweet-es-4df8aa71.pth',
-        'ar': 'https://www.nilsschaetti.com/models/cnnctweet-ar-4df8aa71.pth'
-    }
-}
-
-# Voc URLs
-voc_urls = {
-    'cnnctweet': {
-        'en': 'https://www.nilsschaetti.com/models/cnnctweet-voc-en-bd63e232.pth',
-        'es': 'https://www.nilsschaetti.com/models/cnnctweet-voc-es-4df8aa71.pth',
-        'ar': 'https://www.nilsschaetti.com/models/cnnctweet-voc-ar-4df8aa71.pth'
+# Model settings
+model_settings = {
+    'c1': {
+    },
+    'c2': {
+        'en': {
+            'model': 'https://www.nilsschaetti.com/models/cnnctweet-en-0abe5371.pth',
+            'voc': 'https://www.nilsschaetti.com/models/cnnctweet-voc-en-83ebc7f3.pth',
+            'embedding_dim': 50,
+            'voc_size': 21510,
+            'text_length': 165
+        },
+        'es': {
+            'model': 'https://www.nilsschaetti.com/models/cnnctweet-es-1a993977.pth',
+            'voc': 'https://www.nilsschaetti.com/models/cnnctweet-voc-es-43d0a2a7.pth',
+            'embedding_dim': 50,
+            'voc_size': 30025,
+            'text_length': 165
+        },
+        'ar': {
+            'model': 'https://www.nilsschaetti.com/models/cnnctweet-ar-9f761a33.pth',
+            'voc': 'https://www.nilsschaetti.com/models/cnnctweet-voc-ar-5fb3b776.pth',
+            'embedding_dim': 50,
+            'voc_size': 31694,
+            'text_length': 165
+        }
     }
 }
 
@@ -122,7 +133,7 @@ class CNNCTweet(nn.Module):
 
 
 # Load model
-def cnnctweet(pretrained=False, lang='en', **kwargs):
+def cnnctweet(pretrained=False, n_gram='c2', lang='en', map_location=None, **kwargs):
     """
     Load model
     :param pretrained:
@@ -130,11 +141,14 @@ def cnnctweet(pretrained=False, lang='en', **kwargs):
     :param kwargs:
     :return:
     """
-    model = CNNCTweet(**kwargs)
-    voc = dict()
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['cgfs'][lang]))
-        voc = model_zoo.load_url(voc_urls['cgfs'][lang])
+        model = CNNCTweet(text_length=model_settings[n_gram][lang]['text_length'], vocab_size=model_settings[n_gram][lang]['voc_size'],
+                          embedding_dim=model_settings[n_gram][lang]['embedding_dim'])
+        model.load_state_dict(model_zoo.load_url(model_settings[n_gram][lang]['model'], map_location=map_location))
+        voc = model_zoo.load_url(model_settings[n_gram][lang]['voc'], map_location=map_location)
+    else:
+        model = CNNCTweet(**kwargs)
+        voc = dict()
     # end if
     return model, voc
 # end cnnctweet
