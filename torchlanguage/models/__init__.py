@@ -9,6 +9,8 @@ from CNNCDist import CNNCDist
 from CNNCTweet import CNNCTweet, cnnctweet
 from CNNEmbed import CNNEmbed
 from CNNgram import CNNgram
+from CNNSCD import CNNSCD, cnnscd, cnnscd25
 
 # All
-__all__ = ["BiEGRU", "CGFS", "cgfs", "CNN3C", "CNNCDist", "CNNCTweet", "cnnctweet", "CNNEmbed", "CNNgram"]
+__all__ = ["BiEGRU", "CGFS", "cgfs", "CNN3C", "CNNCDist", "CNNCTweet", "cnnctweet", "CNNEmbed", "CNNgram", "CNNSCD",
+           "cnnscd", "cnnscd25"]
