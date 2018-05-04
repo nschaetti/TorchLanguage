@@ -17,7 +17,8 @@ model_settings = {
     'c1': {
         25: {
             'en': {
-                'model': 'https://www.nilsschaetti.com/models/cnnscd-25-en-6920d99f.pth',
+                'model': 'https://www.nilsschaetti.com/models/cnnscd-25-en-e4057570.pth',
+                'voc': 'https://www.nilsschaetti.com/models/cnnscd-25-voc-en-864458f4.pth',
                 'embedding_dim': 50,
                 'voc_size': 1628,
                 'text_length': 11400
@@ -165,10 +166,11 @@ def cnnscd25(n_gram='c1', lang='en', map_location=None):
     model = CNNSCD(
         input_dim=model_settings[n_gram][25][lang]['text_length'],
         vocab_size=model_settings[n_gram][25][lang]['voc_size'],
-        out_channels=(25, 25, 25)
+        out_channels=(25, 25, 25),
+        embedding_dim=model_settings[n_gram][25][lang]['embedding_dim']
     )
-    model_state_dict, voc = model_zoo.load_url(model_settings[n_gram][25][lang]['model'], map_location=map_location)
-    model.load_state_dict(model_state_dict)
+    model.load_state_dict(model_zoo.load_url(model_settings[n_gram][25][lang]['model'], map_location=map_location))
+    voc = model_zoo.load_url(model_settings[n_gram][25][lang]['voc'], map_location=map_location)
     return model, voc
 # end cnnscd25
 
