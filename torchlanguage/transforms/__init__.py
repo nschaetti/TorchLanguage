@@ -24,6 +24,7 @@ from .RemoveRegex import RemoveRegex
 from .Reshape import Reshape
 from .Statistics import Statistics
 from .Tag import Tag
+from .ToCPU import ToCPU
 from .ToCUDA import ToCUDA
 from .ToFrequencyVector import ToFrequencyVector
 from .ToIndex import ToIndex
@@ -41,6 +42,6 @@ __all__ = [
     'Character', 'Character2Gram', 'Character3Gram', 'Compose', 'DropOut', 'Embedding', 'FeatureSelector',
     'FunctionWord', 'GensimModel', 'Transformer', 'GloveVector', 'HorizontalStack', 'MaxIndex', 'Normalize',
     'NormalizeDim', 'PartOfSpeech', 'RemoveCharacter', 'RemoveLines', 'RemoveRegex', 'Reshape', 'Statistics', 'Tag',
-    'ToCUDA', 'ToFrequencyVector', 'ToIndex', 'Token', 'ToLength', 'ToLower', 'ToNGram', 'ToOneHot', 'ToUpper',
+    'ToCUDA', 'ToCPU', 'ToFrequencyVector', 'ToIndex', 'Token', 'ToLength', 'ToLower', 'ToNGram', 'ToOneHot', 'ToUpper',
     'VerticalStack', 'WordFrequencies'
 ]
