@@ -17,11 +17,11 @@ model_settings = {
     'c1': {
         25: {
             'en': {
-                'model': 'https://www.nilsschaetti.com/models/cnnscd-25-en-e4057570.pth',
-                'voc': 'https://www.nilsschaetti.com/models/cnnscd-25-voc-en-864458f4.pth',
+                'model': 'https://www.nilsschaetti.com/models/cnnscd-25-en-34b74a3f.pth',
+                'voc': 'https://www.nilsschaetti.com/models/cnnscd-25-voc-en-3875f0ad.pth',
                 'embedding_dim': 50,
                 'voc_size': 1628,
-                'text_length': 11400
+                'text_length': 12000
             }
         }
     },
@@ -37,8 +37,8 @@ class CNNSCD(nn.Module):
     """
 
     # Constructor
-    def __init__(self, input_dim, vocab_size, embedding_dim=50, out_channels=(500, 500, 500), kernel_sizes=(3, 4, 5),
-                 n_linear=2, linear_size=1500, max_pool_size=700, max_pool_stride=350):
+    def __init__(self, input_dim, vocab_size, embedding_dim=50, out_channels=(25, 25, 25), kernel_sizes=(3, 4, 5),
+                 n_linear=1, linear_size=1500, max_pool_size=700, max_pool_stride=350, use_dropout=True):
         """
         Constructor
         :param input_dim:
@@ -60,6 +60,11 @@ class CNNSCD(nn.Module):
         self.n_linear = n_linear
         self.max_pool_size = max_pool_size
         self.max_pool_stride = max_pool_stride
+        self.use_dropout = use_dropout
+
+        # Drop out
+        self.dropout = nn.Dropout()
+        self.dropout2d = nn.Dropout2d(p=0.7)
 
         # Embedding layer
         self.embeddings = nn.Embedding(vocab_size, embedding_dim)
@@ -117,9 +122,9 @@ class CNNSCD(nn.Module):
         embeds = torch.unsqueeze(embeds, dim=1)
 
         # Conv window
-        out_win1 = F.relu(self.conv_w1(embeds))
-        out_win2 = F.relu(self.conv_w2(embeds))
-        out_win3 = F.relu(self.conv_w3(embeds))
+        out_win1 = self.conv_w1(embeds)
+        out_win2 = self.conv_w2(embeds)
+        out_win3 = self.conv_w3(embeds)
 
         # Remove last dim
         out_win1 = torch.squeeze(out_win1, dim=3)
@@ -127,14 +132,14 @@ class CNNSCD(nn.Module):
         out_win3 = torch.squeeze(out_win3, dim=3)
 
         # Max pooling
-        max_win1 = self.max_pool_w1(out_win1)
-        max_win2 = self.max_pool_w2(out_win2)
-        max_win3 = self.max_pool_w3(out_win3)
+        max_win1 = F.relu(self.max_pool_w1(out_win1))
+        max_win2 = F.relu(self.max_pool_w2(out_win2))
+        max_win3 = F.relu(self.max_pool_w3(out_win3))
 
         # Flatten
         max_win1 = max_win1.view(-1, self.max_pool1_output_dim)
-        max_win2 = max_win1.view(-1, self.max_pool2_output_dim)
-        max_win3 = max_win1.view(-1, self.max_pool3_output_dim)
+        max_win2 = max_win2.view(-1, self.max_pool2_output_dim)
+        max_win3 = max_win3.view(-1, self.max_pool3_output_dim)
 
         # Concatenate
         out = torch.cat((max_win1, max_win2, max_win3), dim=1)
@@ -142,12 +147,12 @@ class CNNSCD(nn.Module):
         # Linear
         if self.n_linear == 2:
             # Linear 1
-            out = F.relu(self.linear1(out))
+            out = F.relu(self.linear1(self.dropout(out)))
 
             # Linear 2
-            return self.linear2(out)
+            return self.linear2(self.dropout(out))
         else:
-            return self.linear1(out)
+            return self.linear1(self.dropout(out))
         # end if
     # end forward
 
@@ -167,7 +172,9 @@ def cnnscd25(n_gram='c1', lang='en', map_location=None):
         input_dim=model_settings[n_gram][25][lang]['text_length'],
         vocab_size=model_settings[n_gram][25][lang]['voc_size'],
         out_channels=(25, 25, 25),
-        embedding_dim=model_settings[n_gram][25][lang]['embedding_dim']
+        embedding_dim=model_settings[n_gram][25][lang]['embedding_dim'],
+        n_linear=2,
+        linear_size=1500
     )
     model.load_state_dict(model_zoo.load_url(model_settings[n_gram][25][lang]['model'], map_location=map_location))
     voc = model_zoo.load_url(model_settings[n_gram][25][lang]['voc'], map_location=map_location)
