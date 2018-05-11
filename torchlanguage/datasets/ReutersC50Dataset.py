@@ -257,9 +257,6 @@ class ReutersC50Dataset(Dataset):
                 author_count += 1
             # end if
         # end for
-
-        # Shuffle texts
-        shuffle(self.texts)
     # end _load
 
 # end ReutersC50Dataset
