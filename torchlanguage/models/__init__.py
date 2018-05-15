@@ -3,6 +3,7 @@
 
 # Imports
 from BiEGRU import BiEGRU
+from CCSAA import CCSAA, ccsaa
 from CGFS import CGFS, cgfs
 from CNN3C import CNN3C
 from CNNCDist import CNNCDist
@@ -12,5 +13,5 @@ from CNNgram import CNNgram
 from CNNSCD import CNNSCD, cnnscd, cnnscd25
 
 # All
-__all__ = ["BiEGRU", "CGFS", "cgfs", "CNN3C", "CNNCDist", "CNNCTweet", "cnnctweet", "CNNEmbed", "CNNgram", "CNNSCD",
+__all__ = ["BiEGRU", "CCSAA", "ccsaa", "CGFS", "cgfs", "CNN3C", "CNNCDist", "CNNCTweet", "cnnctweet", "CNNEmbed", "CNNgram", "CNNSCD",
            "cnnscd", "cnnscd25"]
