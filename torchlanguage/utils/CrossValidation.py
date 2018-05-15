@@ -42,6 +42,16 @@ class CrossValidation(Dataset):
         self.fold += 1
     # end next_fold
 
+    # Set fold
+    def set_fold(self, fold):
+        """
+        Set fold
+        :param fold:
+        :return:
+        """
+        self.fold = fold
+    # end set_fold
+
     ###################################
     # PRIVATE
     ###################################
@@ -77,7 +87,6 @@ class CrossValidation(Dataset):
 
         return folds, fold_sizes, indexes
     # end _create_folds
-
 
     ###################################
     # OVERRIDE
