@@ -9,8 +9,7 @@ import os
 import zipfile
 import json
 import codecs
-from random import shuffle
-import math
+import random
 import pickle
 from datetime import datetime
 
@@ -120,7 +119,8 @@ class ReutersC50Dataset(Dataset):
             # Transformed size
             if type(transformed) is list:
                 transformed_size = len(transformed)
-            elif type(transformed) is torch.LongTensor or type(transformed) is torch.FloatTensor:
+            elif type(transformed) is torch.LongTensor or type(transformed) is torch.FloatTensor \
+                    or type(transformed) is torch.cuda.LongTensor or type(transformed) is torch.cuda.FloatTensor:
                 transformed_size = transformed.size(0)
             # end if
 
@@ -257,6 +257,10 @@ class ReutersC50Dataset(Dataset):
                 author_count += 1
             # end if
         # end for
+
+        # Shuffle but always the same
+        random.seed(1985)
+        random.shuffle(self.texts)
     # end _load
 
 # end ReutersC50Dataset
