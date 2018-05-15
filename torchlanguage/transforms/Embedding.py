@@ -4,6 +4,7 @@
 # Imports
 import gensim
 import torch
+import torch.nn as nn
 import numpy as np
 from .Transformer import Transformer
 
@@ -15,7 +16,7 @@ class Embedding(Transformer):
     """
 
     # Constructor
-    def __init__(self, embedding):
+    def __init__(self, weights, voc_size):
         """
         Constructor
         :param weights: Embedding weight matrix
@@ -24,11 +25,9 @@ class Embedding(Transformer):
         super(Embedding, self).__init__()
 
         # Properties
-        self.weights = embedding.weights
-        self.voc_size = embedding.voc_size
-        self.embedding_dim = embedding.embedding_dim
-        self.token_to_ix = embedding.gram_to_ix
-        self.ix_to_token = embedding.ix_to_gram
+        self.weights = weights
+        self.voc_size = voc_size
+        self.embedding_dim = weights.size(1)
     # end __init__
 
     ##############################################
@@ -117,7 +116,7 @@ class Embedding(Transformer):
                 # Test zero
                 if torch.sum(embedding_vector) == 0.0:
                     zero += 1.0
-                    embedding_vector = np.zeros(self.input_dim)
+                    embedding_vector = torch.zeros(self.input_dim)
                 # end if
 
                 # Start/continue
