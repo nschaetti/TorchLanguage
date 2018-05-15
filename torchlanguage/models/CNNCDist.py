@@ -35,7 +35,7 @@ class CNNCDist(nn.Module):
 
     # Constructor
     def __init__(self, window_size, vocab_size, n_classes, embedding_dim=50, out_channels=(500, 500, 500),
-                 kernel_sizes=(3, 4, 5), n_linear=2, linear_size=1500, temporal_division=1.0):
+                 kernel_sizes=(3, 4, 5), n_linear=2, linear_size=1500, temporal_division=1.0, use_dropout=True):
         """
         Constructor
         :param vocab_size: Vocabulary size
@@ -52,6 +52,11 @@ class CNNCDist(nn.Module):
         self.n_classes = n_classes
         self.n_linear = n_linear
         self.temporal_division = temporal_division
+        self.use_dropout = use_dropout
+
+        # Drop out
+        self.dropout = nn.Dropout()
+        self.dropout2d = nn.Dropout2d(p=0.7)
 
         # Embedding layer
         self.embeddings = nn.Embedding(vocab_size, embedding_dim)
@@ -113,9 +118,18 @@ class CNNCDist(nn.Module):
         embeds = torch.unsqueeze(embeds, dim=1)
 
         # Conv window
-        out_win1 = F.relu(self.conv_w1(embeds))
-        out_win2 = F.relu(self.conv_w2(embeds))
-        out_win3 = F.relu(self.conv_w3(embeds))
+        """if self.use_dropout:
+            out_win1 = self.dropout2d(self.conv_w1(embeds))
+            out_win2 = self.dropout2d(self.conv_w2(embeds))
+            out_win3 = self.dropout2d(self.conv_w3(embeds))
+        else:
+            out_win1 = self.conv_w1(embeds)
+            out_win2 = self.conv_w2(embeds)
+            out_win3 = self.conv_w3(embeds)
+        # end if"""
+        out_win1 = self.conv_w1(embeds)
+        out_win2 = self.conv_w2(embeds)
+        out_win3 = self.conv_w3(embeds)
 
         # Remove last dim
         out_win1 = torch.squeeze(out_win1, dim=3)
@@ -123,9 +137,9 @@ class CNNCDist(nn.Module):
         out_win3 = torch.squeeze(out_win3, dim=3)
 
         # Max pooling
-        max_win1 = self.max_pool_w1(out_win1)
-        max_win2 = self.max_pool_w2(out_win2)
-        max_win3 = self.max_pool_w3(out_win3)
+        max_win1 = F.relu(self.max_pool_w1(out_win1))
+        max_win2 = F.relu(self.max_pool_w2(out_win2))
+        max_win3 = F.relu(self.max_pool_w3(out_win3))
 
         # Concatenate
         out = torch.cat((max_win1, max_win2, max_win3), dim=1)
@@ -158,12 +172,13 @@ class CNNCDist(nn.Module):
         # Linear
         if self.n_linear == 2:
             # Linear 1
-            out = F.relu(self.linear1(out))
+            out = F.relu(self.linear1(self.dropout(out)))
 
             # Linear 2
-            return self.linear2(out)
+            return F.log_softmax(self.linear2(self.dropout(out)))
+            # return self.linear2(self.dropout(out))
         else:
-            return self.linear1(out)
+            return self.linear1(self.dropout(out))
         # end if
     # end forward
 
