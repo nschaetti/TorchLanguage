@@ -40,7 +40,7 @@ class FileDirectory(Dataset):
         # end if
 
         # List file
-        self.files = os.listdir(root)
+        self.samples, self.classes = self._load()
     # end __init__
 
     #############################################
@@ -81,6 +81,25 @@ class FileDirectory(Dataset):
         os.remove(path_to_zip)
     # end _download
 
+    # Load dataset
+    def _load(self):
+        """
+        Load dataset
+        :return:
+        """
+        samples = list()
+        classes = list()
+        for file_name in os.listdir(self.root):
+            # Get class name
+            class_name = unicode(file_name[:file_name.find("_")])
+            samples.append((file_name, class_name))
+            if class_name not in classes:
+                classes.append(class_name)
+            # end if
+        # end for
+        return samples, classes
+    # end _load
+
     #############################################
     # OVERRIDE
     #############################################
@@ -91,7 +110,7 @@ class FileDirectory(Dataset):
         Length
         :return:
         """
-        return len(self.files)
+        return len(self.samples)
     # end __len__
 
     # Get item
@@ -102,10 +121,7 @@ class FileDirectory(Dataset):
         :return:
         """
         # Truth
-        file_name = self.files[idx]
-
-        # Get class name
-        class_name = unicode(file_name[:file_name.find("_")])
+        file_name, class_name = self.samples[idx]
 
         # Transformation
         if self.transform is not None:
