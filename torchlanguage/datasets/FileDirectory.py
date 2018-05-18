@@ -41,6 +41,9 @@ class FileDirectory(Dataset):
 
         # List file
         self.samples, self.classes = self._load()
+
+        # N classes
+        self.n_classes = len(self.classes)
     # end __init__
 
     #############################################
@@ -92,7 +95,8 @@ class FileDirectory(Dataset):
         for file_name in os.listdir(self.root):
             # Get class name
             class_name = unicode(file_name[:file_name.find("_")])
-            samples.append((file_name, class_name))
+            title = unicode(file_name[file_name.find("_")+1:-4])
+            samples.append((file_name, class_name, title))
             if class_name not in classes:
                 classes.append(class_name)
             # end if
@@ -121,13 +125,13 @@ class FileDirectory(Dataset):
         :return:
         """
         # Truth
-        file_name, class_name = self.samples[idx]
+        file_name, class_name, title = self.samples[idx]
 
         # Transformation
         if self.transform is not None:
-            return self.transform(codecs.open(os.path.join(self.root, self.files[idx]), 'rb', encoding='utf-8').read()), class_name
+            return self.transform(codecs.open(os.path.join(self.root, file_name), 'rb', encoding='utf-8').read()), class_name, title
         else:
-            return codecs.open(os.path.join(self.root, self.files[idx]), 'rb', encoding='utf-8').read(), class_name
+            return codecs.open(os.path.join(self.root, file_name), 'rb', encoding='utf-8').read(), class_name, title
         # end if
     # end __getitem__
 
