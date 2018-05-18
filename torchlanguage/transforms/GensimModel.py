@@ -75,11 +75,13 @@ class GensimModel(Transformer):
         :param tokens:
         :return:
         """
+        # Text length
+        text_length = len(tokens)
+
         # Inputs as tensor
-        inputs = torch.FloatTensor(1, self.input_dim)
+        inputs = torch.zeros(text_length, self.input_dim)
 
         # Start
-        start = True
         count = 0.0
 
         # OOV
@@ -87,7 +89,7 @@ class GensimModel(Transformer):
         self.oov = 0.0
 
         # For each tokens
-        for token in tokens:
+        for index, token in enumerate(tokens):
             found = False
             # Try normal
             try:
@@ -108,13 +110,8 @@ class GensimModel(Transformer):
             # end if
 
             # Start/continue
-            if not start:
-                inputs = torch.cat((inputs, torch.FloatTensor(word_vector).unsqueeze_(0)), dim=0)
-            else:
-                inputs = torch.FloatTensor(word_vector).unsqueeze_(0)
-                start = False
-            # end if
-            count += 1
+            inputs[index] = torch.from_numpy(word_vector)
+            count += 1.0
         # end for
 
         # OOV
