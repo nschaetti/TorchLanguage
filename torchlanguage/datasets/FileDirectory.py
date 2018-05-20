@@ -17,7 +17,7 @@ class FileDirectory(Dataset):
     """
 
     # Constructor
-    def __init__(self, root='./data', download=False, transform=None, download_url=""):
+    def __init__(self, root='./data', download=False, transform=None, download_url="", save_transform=False):
         """
         Constructor
         :param root: Data root directory.
@@ -28,6 +28,7 @@ class FileDirectory(Dataset):
         self.root = root
         self.transform = transform
         self.download_url = download_url
+        self.save_transform = save_transform
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -93,12 +94,14 @@ class FileDirectory(Dataset):
         samples = list()
         classes = list()
         for file_name in os.listdir(self.root):
-            # Get class name
-            class_name = unicode(file_name[:file_name.find("_")])
-            title = unicode(file_name[file_name.find("_")+1:-4])
-            samples.append((file_name, class_name, title))
-            if class_name not in classes:
-                classes.append(class_name)
+            if file_name[-4:] == ".txt":
+                # Get class name
+                class_name = unicode(file_name[:file_name.find("_")])
+                title = unicode(file_name[file_name.find("_")+1:-4])
+                samples.append((file_name, class_name, title))
+                if class_name not in classes:
+                    classes.append(class_name)
+                # end if
             # end if
         # end for
         return samples, classes
@@ -129,9 +132,26 @@ class FileDirectory(Dataset):
 
         # Transformation
         if self.transform is not None:
-            return self.transform(codecs.open(os.path.join(self.root, file_name), 'rb', encoding='utf-8').read()), class_name, title
+            if os.path.exists(os.path.join(self.root, file_name + ".pth")):
+                return torch.load(open(os.path.join(self.root, file_name + ".pth"), "rb")), class_name, title
+            else:
+                try:
+                    transformed = self.transform(codecs.open(os.path.join(self.root, file_name), 'r', encoding='utf-8').read())
+                except UnicodeDecodeError:
+                    transformed = self.transform(codecs.open(os.path.join(self.root, file_name), 'r', encoding='windows-1252').read())
+                # end try
+                # transformed = self.transform(unicode(codecs.open(os.path.join(self.root, file_name), 'rb').read()))
+                if self.save_transform:
+                    torch.save(transformed, open(os.path.join(self.root, file_name + ".pth"), "wb"))
+                # end if
+                return transformed, class_name, title
+            # end if
         else:
-            return codecs.open(os.path.join(self.root, file_name), 'rb', encoding='utf-8').read(), class_name, title
+            try:
+                return codecs.open(os.path.join(self.root, file_name), 'r', encoding='utf-8').read(), class_name, title
+            except UnicodeDecodeError:
+                return codecs.open(os.path.join(self.root, file_name), 'r', encoding='windows-1252').read(), class_name, title
+            # end if
         # end if
     # end __getitem__
 
