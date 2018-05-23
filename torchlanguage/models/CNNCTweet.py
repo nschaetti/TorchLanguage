@@ -49,7 +49,7 @@ class CNNCTweet(nn.Module):
 
     # Constructor
     def __init__(self, text_length, vocab_size, embedding_dim=300, out_channels=(500, 500, 500),
-                 kernel_sizes=(3, 4, 5)):
+                 kernel_sizes=(3, 4, 5), n_classes=2):
         """
         Constructor
         :param vocab_size: Vocabulary size
@@ -62,6 +62,7 @@ class CNNCTweet(nn.Module):
         # Properties
         self.embedding_dim = embedding_dim
         self.text_length = text_length
+        self.n_classes = n_classes
 
         # Embedding layer
         self.embeddings = nn.Embedding(vocab_size, embedding_dim)
@@ -85,7 +86,7 @@ class CNNCTweet(nn.Module):
 
         # Linear layer
         self.linear_size = out_channels[0] + out_channels[1] + out_channels[2]
-        self.linear = nn.Linear(self.linear_size, 2)
+        self.linear = nn.Linear(self.linear_size, n_classes)
     # end __init__
 
     # Forward
