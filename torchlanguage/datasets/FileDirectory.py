@@ -8,6 +8,7 @@ import urllib
 import zipfile
 import os
 import codecs
+import random
 
 
 # File directory dataset
@@ -17,7 +18,7 @@ class FileDirectory(Dataset):
     """
 
     # Constructor
-    def __init__(self, root='./data', download=False, transform=None, download_url="", save_transform=False):
+    def __init__(self, root='./data', download=False, transform=None, download_url="", save_transform=False, shuffle=False):
         """
         Constructor
         :param root: Data root directory.
@@ -29,6 +30,7 @@ class FileDirectory(Dataset):
         self.transform = transform
         self.download_url = download_url
         self.save_transform = save_transform
+        self.shuffle = shuffle
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -42,6 +44,12 @@ class FileDirectory(Dataset):
 
         # List file
         self.samples, self.classes = self._load()
+
+        # Shuffle
+        if shuffle:
+            random.seed(1)
+            random.shuffle(self.samples)
+        # end if
 
         # N classes
         self.n_classes = len(self.classes)
