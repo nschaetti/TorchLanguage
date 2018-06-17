@@ -13,7 +13,7 @@ class ToLength(Transformer):
     """
 
     # Constructor
-    def __init__(self, length, input_dim=0, min=False):
+    def __init__(self, length, input_dim=0):
         """
         Constructor
         :param length: Fixed length
@@ -22,7 +22,6 @@ class ToLength(Transformer):
         super(ToLength, self).__init__()
 
         # Properties
-        self.min = min
         self.length = length
         self.input_size = input_dim
     # end __init__
@@ -105,11 +104,6 @@ class ToLength(Transformer):
         :param x:
         :return:
         """
-        # Min
-        if self.min and x.size(0) > self.length:
-            return x
-        # end if
-
         # Tensor type
         tensor_type = x.__class__
 
