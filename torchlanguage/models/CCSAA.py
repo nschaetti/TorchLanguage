@@ -27,8 +27,8 @@ class CCSAA(nn.Module):
     """
 
     # Constructor
-    def __init__(self, text_length, vocab_size, n_classes, embedding_dim=50, out_channels=(50, 50, 50),
-                 kernel_sizes=(3, 4, 5)):
+    def __init__(self, text_length, vocab_size, n_classes, embedding_dim=50, out_channels=(200, 200, 200),
+                 kernel_sizes=(3, 4, 5), n_features=100, use_dropout=True):
         """
         Constructor
         :param vocab_size: Vocabulary size
@@ -42,6 +42,8 @@ class CCSAA(nn.Module):
         self.embedding_dim = embedding_dim
         self.text_length = text_length
         self.n_classes = n_classes
+        self.use_dropout = use_dropout
+        self.n_features = n_features
 
         # Embedding layer
         self.embeddings = nn.Embedding(vocab_size, embedding_dim)
@@ -63,9 +65,15 @@ class CCSAA(nn.Module):
         self.max_pool_w2 = nn.MaxPool1d(kernel_size=text_length - kernel_sizes[1] + 1, stride=0)
         self.max_pool_w3 = nn.MaxPool1d(kernel_size=text_length - kernel_sizes[2] + 1, stride=0)
 
+        # Dropout
+        self.drop_out = nn.Dropout()
+
         # Linear layer
         self.linear_size = out_channels[0] + out_channels[1] + out_channels[2]
-        self.linear = nn.Linear(self.linear_size, n_classes)
+        self.linear = nn.Linear(self.linear_size, self.n_features)
+
+        # Output linear
+        self.linear2 = nn.Linear(self.n_features, n_classes)
     # end __init__
 
     # Forward
@@ -102,11 +110,23 @@ class CCSAA(nn.Module):
         # Flatten
         out = out.view(-1, self.linear_size)
 
+        # Dropout
+        if self.use_dropout:
+            out = self.drop_out(out)
+        # end if
+
         # Linear
-        out = self.linear(out)
+        out = F.relu(self.linear(out))
+
+        # Normalize
+        out = F.normalize(out, p=2, dim=1)
+
+        # Output linear
+        out = self.linear2(out)
 
         # Log Softmax
-        return F.log_softmax(out, dim=1)
+        # return F.log_softmax(out, dim=1)
+        return out
     # end forward
 
 # end CGFS
