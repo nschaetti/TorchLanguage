@@ -30,20 +30,30 @@ class CharacterEncoder(nn.Module):
         super(CharacterEncoder, self).__init__()
 
         # Properties
+        self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
         self.text_length = text_length
         self.n_features = n_features
         self.output_dim = text_length * vocab_size
+        self.inputs_size = text_length * embedding_dim
+        self.encode = False
 
-        # Embedding layer
+        # Embedding
         self.embeddings = nn.Embedding(vocab_size, embedding_dim)
 
-        # Linear layer
-        self.inputs_size = text_length * embedding_dim
-        self.linear = nn.Linear(self.inputs_size, self.n_features[0])
-        self.linear2 = nn.Linear(self.n_features[0], self.n_features[1])
-        self.linear3 = nn.Linear(self.n_features[1], self.n_features[0])
-        self.linear4 = nn.Linear(self.n_features[0], self.output_dim)
+        # Encoder
+        self.encoder = nn.Sequential(
+            nn.Linear(self.inputs_size, self.n_features[0]),
+            nn.ReLU(True),
+            nn.Linear(self.n_features[0], self.n_features[1])
+        )
+
+        # Decoder
+        self.decoder = nn.Sequential(
+            nn.Linear(self.n_features[1], self.n_features[0]),
+            nn.ReLU(True),
+            nn.Linear(self.n_features[0], self.output_dim),
+        )
     # end __init__
 
     # Forward
@@ -53,20 +63,28 @@ class CharacterEncoder(nn.Module):
         :param x:
         :return:
         """
-        # Embeddings
-        embeds = self.embeddings(x)
+        # Embedding
+        x = self.embeddings(x)
 
-        # Flatten
-        out = embeds.view(-1, self.inputs_size)
+        # Reshape
+        x = x.view(-1, self.inputs_size)
 
-        # Linear
-        out = F.sigmoid(self.linear(out))
-        out = F.sigmoid(self.linear2(out))
-        out = F.sigmoid(self.linear3(out))
-        out = F.sigmoid(self.linear4(out))
+        # Encoder
+        x = self.encoder(x)
 
-        # Outputs
-        return out
+        # Normalize
+        x = F.normalize(x, p=2, dim=1)
+
+        # Decode if in training
+        if not self.encode:
+            # Decoder
+            x = self.decoder(x)
+
+            # Reshape
+            x = x.view(-1, self.text_length, self.vocab_size)
+        # end if
+
+        return x
     # end forward
 
 # end CharacterEncoder

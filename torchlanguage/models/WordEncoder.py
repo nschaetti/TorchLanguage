@@ -16,7 +16,7 @@ class WordEncoder(nn.Module):
     """
 
     # Constructor
-    def __init__(self, n_classes, n_gram=3, n_features=(600, 300), embedding_size=300):
+    def __init__(self, n_gram=3, n_features=(600, 300), embedding_size=300):
         """
         Consturctor
         :param n_classes: Number of output classes
@@ -26,20 +26,23 @@ class WordEncoder(nn.Module):
         """
         super(WordEncoder, self).__init__()
         self.n_features = n_features
-        self.n_classes = n_classes
         self.inputs_size = n_gram * embedding_size
+        self.encode = False
 
-        # Linear layer 1
-        self.linear = nn.Linear(self.inputs_size, n_features[0])
+        # Encoder
+        self.encoder = nn.Sequential(
+            nn.Linear(self.inputs_size, n_features[0]),
+            nn.ReLU(True),
+            nn.Linear(n_features[0], n_features[1])
+        )
 
-        # Linear layer 2
-        self.linear2 = nn.Linear(n_features[0], n_features[1])
-
-        # Linear layer 3
-        self.linear3 = nn.Linear(n_features[1], n_features[0])
-
-        # Linear layer 4
-        self.linear4 = nn.Linear(n_features[0], self.inputs_size)
+        # Decoder
+        self.decoder = nn.Sequential(
+            nn.Linear(n_features[1], n_features[0]),
+            nn.ReLU(True),
+            nn.Linear(n_features[0], self.inputs_size),
+            nn.Tanh()
+        )
     # end __init__
 
     # Forward
@@ -52,17 +55,16 @@ class WordEncoder(nn.Module):
         # Flatten
         out = x.view(-1, self.inputs_size)
 
-        # Linear 1
-        out = F.sigmoid(self.linear(out))
+        # Encoder
+        out = self.encoder(out)
 
-        # Linear 2
-        out = F.sigmoid(self.linear2(out))
+        # Normalize
+        out = F.normalize(out, p=2, dim=1)
 
-        # Linear 3
-        out = F.sigmoid(self.linear3(out))
-
-        # Linear 4
-        out = F.sigmoid(self.linear4(out))
+        # Decoder if in training
+        if not self.encode:
+            out = self.decoder(out)
+        # end if
 
         # Outputs
         return out
