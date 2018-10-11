@@ -41,7 +41,7 @@ from .WordFrequencies import WordFrequencies
 __all__ = [
     'Character', 'Character2Gram', 'Character3Gram', 'Compose', 'DropOut', 'Embedding', 'FeatureSelector',
     'FunctionWord', 'GensimModel', 'Transformer', 'GloveVector', 'HorizontalStack', 'MaxIndex', 'Normalize',
-    'NormalizeDim', 'PartOfSpeech', 'RemoveCharacter', 'RemoveLines', 'RemoveRegex', 'Reshape', 'Sense2Vec',
+    'NormalizeDim', 'PartOfSpeech', 'RemoveCharacter', 'RemoveLines', 'RemoveRegex', 'Reshape',
     'Statistics', 'Tag', 'ToCUDA', 'ToCPU', 'ToFrequencyVector', 'ToIndex', 'Token', 'ToLength', 'ToLower', 'ToNGram',
     'ToOneHot', 'ToUpper', 'VerticalStack', 'WordFrequencies'
 ]
