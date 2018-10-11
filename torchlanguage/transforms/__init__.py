@@ -31,6 +31,7 @@ from .ToIndex import ToIndex
 from .Token import Token
 from .ToLength import ToLength
 from .ToLower import ToLower
+from .ToMultipleLength import ToMultipleLength
 from .ToNGram import ToNGram
 from .ToOneHot import ToOneHot
 from .ToUpper import ToUpper
@@ -42,6 +43,6 @@ __all__ = [
     'Character', 'Character2Gram', 'Character3Gram', 'Compose', 'DropOut', 'Embedding', 'FeatureSelector',
     'FunctionWord', 'GensimModel', 'Transformer', 'GloveVector', 'HorizontalStack', 'MaxIndex', 'Normalize',
     'NormalizeDim', 'PartOfSpeech', 'RemoveCharacter', 'RemoveLines', 'RemoveRegex', 'Reshape',
-    'Statistics', 'Tag', 'ToCUDA', 'ToCPU', 'ToFrequencyVector', 'ToIndex', 'Token', 'ToLength', 'ToLower', 'ToNGram',
-    'ToOneHot', 'ToUpper', 'VerticalStack', 'WordFrequencies'
+    'Statistics', 'Tag', 'ToCUDA', 'ToCPU', 'ToFrequencyVector', 'ToIndex', 'Token', 'ToLength', 'ToLower',
+    'ToMultipleLength', 'ToNGram', 'ToOneHot', 'ToUpper', 'VerticalStack', 'WordFrequencies'
 ]
