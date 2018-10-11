@@ -4,7 +4,8 @@
 # Imports
 from .FileDirectory import FileDirectory
 from .ReutersC50Dataset import ReutersC50Dataset
+from .ReutersC50SentenceDataset import ReutersC50SentenceDataset
 from .SFGramDataset import SFGramDataset
 
 # ALL
-__all__ = ['FileDirectory', 'ReutersC50Dataset', 'SFGramDataset']
+__all__ = ['FileDirectory', 'ReutersC50Dataset', 'ReutersC50SentenceDataset', 'SFGramDataset']
