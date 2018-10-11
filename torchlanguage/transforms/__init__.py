@@ -22,6 +22,7 @@ from .RemoveCharacter import RemoveCharacter
 from .RemoveLines import RemoveLines
 from .RemoveRegex import RemoveRegex
 from .Reshape import Reshape
+from .Sense2Vec import Sense2Vec
 from .Statistics import Statistics
 from .Tag import Tag
 from .ToCPU import ToCPU
@@ -41,7 +42,7 @@ from .WordFrequencies import WordFrequencies
 __all__ = [
     'Character', 'Character2Gram', 'Character3Gram', 'Compose', 'DropOut', 'Embedding', 'FeatureSelector',
     'FunctionWord', 'GensimModel', 'Transformer', 'GloveVector', 'HorizontalStack', 'MaxIndex', 'Normalize',
-    'NormalizeDim', 'PartOfSpeech', 'RemoveCharacter', 'RemoveLines', 'RemoveRegex', 'Reshape', 'Statistics', 'Tag',
-    'ToCUDA', 'ToCPU', 'ToFrequencyVector', 'ToIndex', 'Token', 'ToLength', 'ToLower', 'ToNGram', 'ToOneHot', 'ToUpper',
-    'VerticalStack', 'WordFrequencies'
+    'NormalizeDim', 'PartOfSpeech', 'RemoveCharacter', 'RemoveLines', 'RemoveRegex', 'Reshape', 'Sense2Vec',
+    'Statistics', 'Tag', 'ToCUDA', 'ToCPU', 'ToFrequencyVector', 'ToIndex', 'Token', 'ToLength', 'ToLower', 'ToNGram',
+    'ToOneHot', 'ToUpper', 'VerticalStack', 'WordFrequencies'
 ]

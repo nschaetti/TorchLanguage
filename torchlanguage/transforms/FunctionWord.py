@@ -14,7 +14,7 @@ class FunctionWord(Transformer):
     """
 
     # Constructor
-    def __init__(self, model="en_core_web_lg"):
+    def __init__(self, model="en_core_web_lg", join=False):
         """
         Constructor
         :param model: Spacy's model to load.
@@ -23,6 +23,7 @@ class FunctionWord(Transformer):
         super(FunctionWord, self).__init__()
 
         # Properties
+        self.join = join
         self.model = model
         self.nlp = spacy.load(model)
     # end __init__
@@ -93,7 +94,11 @@ class FunctionWord(Transformer):
             # end if
         # end for
 
-        return function_words
+        if not self.join:
+            return function_words
+        else:
+            return u" ".join(function_words)
+        # end if
     # end convert
 
 # end FunctionWord
