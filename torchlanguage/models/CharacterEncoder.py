@@ -18,28 +18,21 @@ class CharacterEncoder(nn.Module):
     """
 
     # Constructor
-    def __init__(self, text_length, vocab_size, embedding_dim=50, n_features=(600, 300)):
+    def __init__(self, text_length, embedding_dim=60, n_features=(800, 400)):
         """
         Constructor
         :param text_length: Text's length
-        :param vocab_size: Vocabulary size
-        :param n_classes: Number of output classes
         :param embedding_dim: Embedding size
         :param n_features: Number of hidden features
         """
         super(CharacterEncoder, self).__init__()
 
         # Properties
-        self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
         self.text_length = text_length
         self.n_features = n_features
-        self.output_dim = text_length * vocab_size
         self.inputs_size = text_length * embedding_dim
         self.encode = False
-
-        # Embedding
-        self.embeddings = nn.Embedding(vocab_size, embedding_dim)
 
         # Encoder
         self.encoder = nn.Sequential(
@@ -52,7 +45,7 @@ class CharacterEncoder(nn.Module):
         self.decoder = nn.Sequential(
             nn.Linear(self.n_features[1], self.n_features[0]),
             nn.ReLU(True),
-            nn.Linear(self.n_features[0], self.output_dim),
+            nn.Linear(self.n_features[0], self.inputs_size),
         )
     # end __init__
 
@@ -63,9 +56,6 @@ class CharacterEncoder(nn.Module):
         :param x:
         :return:
         """
-        # Embedding
-        x = self.embeddings(x)
-
         # Reshape
         x = x.view(-1, self.inputs_size)
 
@@ -81,7 +71,7 @@ class CharacterEncoder(nn.Module):
             x = self.decoder(x)
 
             # Reshape
-            x = x.view(-1, self.text_length, self.vocab_size)
+            x = x.view(-1, self.inputs_size)
         # end if
 
         return x
