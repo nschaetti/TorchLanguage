@@ -120,7 +120,8 @@ class ReutersC50Dataset(Dataset):
             if type(transformed) is list:
                 transformed_size = len(transformed)
             elif type(transformed) is torch.LongTensor or type(transformed) is torch.FloatTensor \
-                    or type(transformed) is torch.cuda.LongTensor or type(transformed) is torch.cuda.FloatTensor:
+                    or type(transformed) is torch.cuda.LongTensor or type(transformed) is torch.cuda.FloatTensor \
+                    or type(transformed) is torch.Tensor:
                 transformed_size = transformed.size(0)
             # end if
 
