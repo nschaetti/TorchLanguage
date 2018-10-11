@@ -22,7 +22,6 @@ from .RemoveCharacter import RemoveCharacter
 from .RemoveLines import RemoveLines
 from .RemoveRegex import RemoveRegex
 from .Reshape import Reshape
-from .Sense2Vec import Sense2Vec
 from .Statistics import Statistics
 from .Tag import Tag
 from .ToCPU import ToCPU
