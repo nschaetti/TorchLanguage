@@ -122,7 +122,13 @@ class ReutersC50Dataset(Dataset):
             elif type(transformed) is torch.LongTensor or type(transformed) is torch.FloatTensor \
                     or type(transformed) is torch.cuda.LongTensor or type(transformed) is torch.cuda.FloatTensor \
                     or type(transformed) is torch.Tensor:
-                transformed_size = transformed.size(0)
+                transformed_dim = transformed.dim()
+                transformed_size = transformed.size(transformed_dim - 1)
+                if transformed_dim > 1:
+                    transformed_batches = transformed.size(transformed_dim - 2)
+                else:
+                    transformed_batches = 1
+                # end if
             # end if
 
             # Save transform
@@ -130,7 +136,7 @@ class ReutersC50Dataset(Dataset):
                 self._save_transform(transformed, text_path, type(self.transform).__name__)
             # end if
 
-            return transformed, self.author2id[author_name], self._create_labels(author_name, transformed_size)
+            return transformed, self.author2id[author_name], self._create_labels(author_name, transformed_dim, transformed_batches, transformed_size)
         else:
             return text_content, self.author2id[author_name]
         # end if
@@ -168,7 +174,7 @@ class ReutersC50Dataset(Dataset):
     # end if
 
     # Create labels
-    def _create_labels(self, author_name, length):
+    def _create_labels(self, author_name, dim, batches, length):
         """
         Create labels
         :param author_name:
@@ -179,10 +185,13 @@ class ReutersC50Dataset(Dataset):
         author_id = self.author2id[author_name]
 
         # Vector
-        tag_vector = torch.zeros(length, self.n_authors)
+        tag_vector = torch.zeros(length * batches, self.n_authors)
 
         # Set
         tag_vector[:, author_id] = 1.0
+
+        # If batches, view
+        tag_vector = tag_vector.view((batches, length, self.n_authors))
 
         return tag_vector
     # end _create_labels
