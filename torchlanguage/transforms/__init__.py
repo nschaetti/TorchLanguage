@@ -17,6 +17,7 @@ from .MaxIndex import MaxIndex
 from .Normalize import Normalize
 from .NormalizeDim import NormalizeDim
 from .PartOfSpeech import PartOfSpeech
+from .Print import Print
 from .RandomSamples import RandomSamples
 from .RemoveCharacter import RemoveCharacter
 from .RemoveLines import RemoveLines
@@ -42,7 +43,7 @@ from .WordFrequencies import WordFrequencies
 __all__ = [
     'Character', 'Character2Gram', 'Character3Gram', 'Compose', 'DropOut', 'Embedding', 'FeatureSelector',
     'FunctionWord', 'GensimModel', 'Transformer', 'GloveVector', 'HorizontalStack', 'MaxIndex', 'Normalize',
-    'NormalizeDim', 'PartOfSpeech', 'RemoveCharacter', 'RemoveLines', 'RemoveRegex', 'Reshape',
+    'NormalizeDim', 'PartOfSpeech', 'Print', 'RemoveCharacter', 'RemoveLines', 'RemoveRegex', 'Reshape',
     'Statistics', 'Tag', 'ToCUDA', 'ToCPU', 'ToFrequencyVector', 'ToIndex', 'Token', 'ToLength', 'ToLower',
     'ToMultipleLength', 'ToNGram', 'ToOneHot', 'ToUpper', 'VerticalStack', 'WordFrequencies'
 ]
