@@ -50,7 +50,7 @@ class ToNGram(Transformer):
         # Add dim if needed
         if type(x) is list:
             return self._transform(x)
-        elif type(x) is torch.LongTensor or type(x) is torch.FloatTensor or type(x) is torch.DoubleTensor:
+        elif type(x) is torch.LongTensor or type(x) is torch.FloatTensor or type(x) is torch.DoubleTensor or type(x) is torch.Tensor:
             # Start
             start = True
 
