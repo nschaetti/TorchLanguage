@@ -102,7 +102,13 @@ class ToNGram(Transformer):
             return [u[i:i + self.n] for i in np.arange(0, len(u) - last, step)]
         elif type(u) is torch.LongTensor or type(u) is torch.FloatTensor or type(u) is torch.Tensor or type(u) is torch.DoubleTensor:
             # Output type
-            dtype = type(u)
+            if "LongTensor" in u.type():
+                dtype = torch.LongTensor
+            elif "DoubleTensor" in u.type():
+                dtype = torch.DoubleTensor
+            else:
+                dtype= torch.FloatTensor
+            # end if
 
             # Length
             if self.overlapse:
