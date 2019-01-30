@@ -4,6 +4,7 @@
 # Imports
 import torch
 from torch.utils.data.dataset import Dataset
+import torchlanguage.transforms
 import urllib
 import os
 import zipfile
@@ -45,6 +46,8 @@ class ReutersC50Dataset(Dataset):
         self.texts = list()
         self.retain_transform = retain_transform
         self.load_transform = load_transform
+        self.last_tokens = None
+        self.tokenizer = torchlanguage.transforms.Token()
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -99,6 +102,9 @@ class ReutersC50Dataset(Dataset):
 
         # Read text
         text_content = codecs.open(text_path, 'r', encoding='utf-8').read()
+
+        # Last text
+        self.last_tokens = self.tokenizer(text_content)
 
         # Transform
         if self.transform is not None:
