@@ -9,8 +9,9 @@ import os
 import zipfile
 import json
 import codecs
-from random import shuffle
+from random import shuffle, seed
 import spacy
+import re
 
 
 # SFGram dataset
@@ -20,7 +21,7 @@ class SFGramDataset(Dataset):
     """
 
     # Constructor
-    def __init__(self, root='./data', download=False, transform=None, dataset_size=91, model='en_vectors_web_lg'):
+    def __init__(self, author, root='./data', download=False, transform=None, load_type='wv'):
         """
         Constructor
         :param root: Data root directory.
@@ -36,11 +37,11 @@ class SFGramDataset(Dataset):
         self.texts = list()
         self.fold = 0
         self.authors_info = dict()
-        self.dataset_size = dataset_size
         self.n_authors = 0
         self.id2tag = dict()
         self.tag2id = dict()
-        self.nlp = spacy.load(model)
+        self.author = author
+        self.load_type = load_type
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -60,46 +61,79 @@ class SFGramDataset(Dataset):
     # PUBLIC
     #############################################
 
-    # Tag text
-    def tag_text(self, text_content):
+    # Segment text by authors
+    def segment_text(self, text_content):
         """
-        Tag text
+        Segment text
         :param text_content:
         :return:
         """
-        # Labels
-        labels = torch.FloatTensor()
-        start = True
+        # List of segments
+        segments = list()
 
-        # Current author id
-        current_author_id = 0
+        # The regex
+        p = re.compile("SFGRAM\_(START|STOP)\_([A-Za-z]+)")
 
-        # For each token
-        for token in self.nlp(text_content):
-            # Tag SFGRAM
-            if u"SFGRAM_START" in token.text:
-                # Author
-                current_author_id = self.tag2id[token.text[13:]] + 1
-            elif u"SFGRAM_STOP" in token.text:
-                # Author
-                current_author_id = 0
+        # Last position
+        last_position = 0
+
+        # Author
+        last_author = 'NONE'
+
+        # For each find
+        for i, m in enumerate(p.finditer(text_content)):
+            segments.append((text_content[last_position:m.start()], last_author))
+            # If start
+            if u"START" in m.group():
+                last_author = m.group()[m.group().rfind('_')+1:]
+            elif u"STOP" in m.group():
+                last_author = 'NONE'
             # end if
 
-            # Vector
-            author_vector = torch.zeros(1, self.n_authors + 1)
-            author_vector[0, current_author_id] = 1.0
-
-            # Add
-            if start:
-                labels = author_vector
-                start = False
-            else:
-                labels = torch.cat((labels, author_vector), dim=0)
-            # end if
+            # Last position
+            last_position = m.start() + len(m.group())
         # end for
 
-        return labels
-    # end tag_text
+        # Add last segment
+        segments.append((text_content[last_position:], last_author))
+
+        return segments
+    # end segment_text
+
+    # Transform text
+    def transform_text(self, text_path, n, text_content, author_prob):
+        """
+        Transform text
+        :return:
+        """
+        # Transform
+        if self.transform is not None:
+            # Path to transformation
+            path_transform = "{}.{}.{}.p".format(text_path, self.load_type, n)
+
+            # Apply or load
+            if os.path.exists(path_transform):
+                transformed = torch.load(path_transform)
+            else:
+                transformed = self.transform(text_content)
+                torch.save(transformed, path_transform)
+            # end if
+
+            # Transformed size
+            if type(transformed) is list:
+                transformed_size = len(transformed)
+            elif type(transformed) is torch.LongTensor or type(transformed) is torch.FloatTensor \
+                    or type(transformed) is torch.cuda.LongTensor or type(transformed) is torch.cuda.FloatTensor \
+                    or type(transformed) is torch.Tensor:
+                transformed_dim = transformed.dim()
+                transformed_size = transformed.size(transformed_dim - 2)
+            # end if
+
+            return transformed, author_prob, self._create_labels(author_prob, transformed_size)
+        else:
+            return text_content, author_prob
+        # end if
+    # end transform_text
 
     #############################################
     # OVERRIDE
@@ -127,20 +161,57 @@ class SFGramDataset(Dataset):
         # Read text
         text_content = codecs.open(text_path, 'r', encoding='utf-8').read()
 
-        # Transform
-        if self.transform is not None:
+        # Segment text
+        segments = self.segment_text(text_content)
+
+        # Author ID
+        author_id = self.author2id[self.author]
+
+        # Transform each segment
+        for i, segment in enumerate(segments):
+            # Segment
+            segment_text, segment_author = segment
+
             # Transform
-            transformed = self.transform(text_content)
-            text_to_tags = self.tag_text(text_content)
-            return transformed, text_to_tags
-        else:
-            return text_content, self.tag_text(text_content)
-        # end if
+            if segment_author == author_id:
+                segment_transformed, _, segment_labels = self.transform_text(text_path, i, segment_text, 1.0)
+            else:
+                segment_transformed, _, segment_labels = self.transform_text(text_path, i, segment_text, 0.0)
+            # end if
+
+            # Concate
+            if i == 0:
+                text_transformed = segment_transformed
+                text_labels = segment_labels
+            else:
+                text_transformed = torch.cat((text_transformed, segment_transformed), dim=0)
+                text_labels = torch.cat((text_labels, segment_labels), dim=0)
+            # end if
+        # end for
+
+        return text_transformed, text_labels
     # end __getitem__
 
     ##############################################
     # PRIVATE
     ##############################################
+
+    # Create labels
+    def _create_labels(self, author_prob, transformed_length):
+        """
+        Create labels
+        :param author_name:
+        :param length:
+        :return:
+        """
+        # Vector
+        tag_vector = torch.zeros(transformed_length, 1)
+
+        # Set
+        tag_vector[:, 0] = author_prob
+
+        return tag_vector
+    # end _create_labels
 
     # Create the root directory
     def _create_root(self):
@@ -192,12 +263,13 @@ class SFGramDataset(Dataset):
 
         # For each text
         for f_index, file_name in enumerate(os.listdir(self.root)):
-            if ".txt" in file_name and f_index < self.dataset_size:
+            if ".txt" in file_name:
                 self.texts.append(os.path.join(self.root, file_name))
             # end if
         # end for
 
         # Shuffle texts
+        seed(1)
         shuffle(self.texts)
     # end _load
 
