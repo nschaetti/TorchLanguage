@@ -164,28 +164,28 @@ class SFGramDataset(Dataset):
         # Segment text
         segments = self.segment_text(text_content)
 
-        # Author ID
-        author_id = self.author2id[self.author]
-
         # Transform each segment
         for i, segment in enumerate(segments):
             # Segment
             segment_text, segment_author = segment
 
-            # Transform
-            if segment_author == author_id:
-                segment_transformed, _, segment_labels = self.transform_text(text_path, i, segment_text, 1.0)
-            else:
-                segment_transformed, _, segment_labels = self.transform_text(text_path, i, segment_text, 0.0)
-            # end if
+            # Ok
+            if len(segment_text) > 0:
+                # Transform
+                if segment_author == self.author:
+                    segment_transformed, _, segment_labels = self.transform_text(text_path, i, segment_text, 1.0)
+                else:
+                    segment_transformed, _, segment_labels = self.transform_text(text_path, i, segment_text, 0.0)
+                # end if
 
-            # Concate
-            if i == 0:
-                text_transformed = segment_transformed
-                text_labels = segment_labels
-            else:
-                text_transformed = torch.cat((text_transformed, segment_transformed), dim=0)
-                text_labels = torch.cat((text_labels, segment_labels), dim=0)
+                # Concate
+                if i == 0:
+                    text_transformed = segment_transformed
+                    text_labels = segment_labels
+                else:
+                    text_transformed = torch.cat((text_transformed, segment_transformed), dim=0)
+                    text_labels = torch.cat((text_labels, segment_labels), dim=0)
+                # end if
             # end if
         # end for
 
@@ -263,7 +263,7 @@ class SFGramDataset(Dataset):
 
         # For each text
         for f_index, file_name in enumerate(os.listdir(self.root)):
-            if ".txt" in file_name:
+            if file_name[-4:] == ".txt":
                 self.texts.append(os.path.join(self.root, file_name))
             # end if
         # end for
