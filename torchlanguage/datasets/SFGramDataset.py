@@ -21,7 +21,7 @@ class SFGramDataset(Dataset):
     """
 
     # Constructor
-    def __init__(self, author, root='./data', download=False, transform=None, load_type='wv'):
+    def __init__(self, author, root='./data', download=False, transform=None, load_type='wv', remove_texts=None):
         """
         Constructor
         :param root: Data root directory.
@@ -42,6 +42,8 @@ class SFGramDataset(Dataset):
         self.tag2id = dict()
         self.author = author
         self.load_type = load_type
+        self.last_text = u""
+        self.remove_texts = remove_texts
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -110,7 +112,7 @@ class SFGramDataset(Dataset):
         if self.transform is not None:
             # Path to transformation
             path_transform = "{}.{}.{}.p".format(text_path, self.load_type, n)
-
+            # print(path_transform)
             # Apply or load
             if os.path.exists(path_transform):
                 transformed = torch.load(path_transform)
@@ -158,6 +160,9 @@ class SFGramDataset(Dataset):
         # Current file
         text_path = self.texts[idx]
 
+        # Last text
+        self.last_text = text_path
+
         # Read text
         text_content = codecs.open(text_path, 'r', encoding='utf-8').read()
 
@@ -169,23 +174,46 @@ class SFGramDataset(Dataset):
             # Segment
             segment_text, segment_author = segment
 
+            # Remove texts
+            if self.remove_texts is not None:
+                for t in self.remove_texts:
+                    segment_text = segment_text.replace(t, u"")
+                # end for
+            # end if
+
             # Ok
             if len(segment_text) > 0:
-                # Transform
-                if segment_author == self.author:
-                    segment_transformed, _, segment_labels = self.transform_text(text_path, i, segment_text, 1.0)
-                else:
-                    segment_transformed, _, segment_labels = self.transform_text(text_path, i, segment_text, 0.0)
-                # end if
+                if self.transform is not None:
+                    # Transform
+                    if segment_author == self.author:
+                        segment_transformed, _, segment_labels = self.transform_text(text_path, i, segment_text, 1.0)
+                    else:
+                        segment_transformed, _, segment_labels = self.transform_text(text_path, i, segment_text, 0.0)
+                    # end if
 
-                # Concate
-                if i == 0:
-                    text_transformed = segment_transformed
-                    text_labels = segment_labels
+                    # Concate
+                    if i == 0:
+                        text_transformed = segment_transformed
+                        text_labels = segment_labels
+                    else:
+                        text_transformed = torch.cat((text_transformed, segment_transformed), dim=0)
+                        text_labels = torch.cat((text_labels, segment_labels), dim=0)
+                    # end if
                 else:
-                    text_transformed = torch.cat((text_transformed, segment_transformed), dim=0)
-                    text_labels = torch.cat((text_labels, segment_labels), dim=0)
-                # end if
+                    # Transform
+                    if segment_author == self.author:
+                        segment_transformed, segment_labels = self.transform_text(text_path, i, segment_text, 1.0)
+                    else:
+                        segment_transformed, segment_labels = self.transform_text(text_path, i, segment_text, 0.0)
+                    # end if
+
+                    if i == 0:
+                        text_transformed = [segment_transformed]
+                        text_labels = [int(segment_labels)]
+                    else:
+                        text_transformed.append(segment_transformed)
+                        text_labels.append(int(segment_labels))
+                    # end if
             # end if
         # end for
 
