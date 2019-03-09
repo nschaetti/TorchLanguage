@@ -12,6 +12,7 @@ import codecs
 from random import shuffle, seed
 import spacy
 import re
+import math
 
 
 # SFGram dataset
@@ -21,7 +22,7 @@ class SFGramDataset(Dataset):
     """
 
     # Constructor
-    def __init__(self, author, root='./data', download=False, transform=None, load_type='wv', remove_texts=None):
+    def __init__(self, author, root='./data', download=False, transform=None, load_type='wv', remove_texts=None, homogeneous=True):
         """
         Constructor
         :param root: Data root directory.
@@ -44,6 +45,8 @@ class SFGramDataset(Dataset):
         self.load_type = load_type
         self.last_text = u""
         self.remove_texts = remove_texts
+        self.homogenous = homogeneous
+        self.text2author = dict()
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -280,6 +283,7 @@ class SFGramDataset(Dataset):
         # Authors info
         self.authors_info = json.load(open(os.path.join(self.root, "authors.json"), 'r'))
         self.n_authors = len(self.authors_info.keys())
+        author_texts = list()
 
         # For each author
         for author_index, author_name in enumerate(self.authors_info.keys()):
@@ -287,18 +291,84 @@ class SFGramDataset(Dataset):
             self.id2author[author_index] = author_name
             self.id2tag[author_index] = self.authors_info[author_name]['id']
             self.tag2id[self.authors_info[author_name]['id']] = author_index
+
+            # Text to author
+            if self.authors_info[author_name]['id'] == self.author:
+                for t in self.authors_info[author_name]['texts']:
+                    author_texts.append(t['magazine'])
+                # end for
+            # end if
         # end for
 
         # For each text
         for f_index, file_name in enumerate(os.listdir(self.root)):
-            if file_name[-4:] == ".txt":
-                self.texts.append(os.path.join(self.root, file_name))
+            text_name = file_name[:-4]
+            text_ext = file_name[-4:]
+            if text_ext == ".txt":
+                text_path = os.path.join(self.root, file_name)
+                self.texts.append(text_path)
+                if text_name in author_texts:
+                    self.text2author[text_path] = self.author
+                else:
+                    self.text2author[text_path] = 'NONE'
+                # end if
             # end if
         # end for
 
         # Shuffle texts
         seed(1)
         shuffle(self.texts)
+
+        # Make it homogeneous
+        if self.homogenous:
+            self.texts = self._make_homogenous(self.texts)
+        # end if
     # end _load
+
+    # Make homogenous
+    def _make_homogenous(self, texts):
+        """
+        Make homogenous
+        :param texts:
+        :return:
+        """
+        # List
+        none_list = list()
+        author_list = list()
+        homogenous_list = list()
+
+        # For each text
+        for text in texts:
+            if self.text2author[text] == 'NONE':
+                none_list.append(text)
+            else:
+                author_list.append(text)
+            # end if
+        # end for
+
+        # Padding
+        author_length = float(len(author_list))
+        none_length = float(len(none_list))
+        total_length = len(none_list) + len(author_list)
+        padding = int(math.ceil(total_length / author_length))
+
+        # For each text
+        none_index = 0
+        author_index = 0
+        for i in range(total_length):
+            if i % padding == 0 and author_index < author_length:
+                homogenous_list.append(author_list[author_index])
+                author_index += 1
+            elif none_index < none_length:
+                homogenous_list.append(none_list[none_index])
+                none_index += 1
+            else:
+                homogenous_list.append(author_list[author_index])
+                author_index += 1
+            # end if
+        # end for
+
+        return homogenous_list
+    # end _make_homogenous
 
 # end ReutersC50Dataset
