@@ -135,7 +135,8 @@ class ReutersC50Dataset(Dataset):
                 root_text_path = text_path[:-4]
 
                 # Load features
-                text_features = np.load(root_text_path + u"." + self.load_features + u".npy")
+                text_features = torch.from_numpy(np.load(root_text_path + u"." + self.load_features + u".npy"))
+                text_features = text_features.type(torch.FloatTensor)
 
                 # Concate
                 transformed = torch.cat((transformed, text_features), dim=1)
