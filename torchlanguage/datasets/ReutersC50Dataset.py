@@ -48,6 +48,7 @@ class ReutersC50Dataset(Dataset):
         self.load_transform = load_transform
         self.last_tokens = None
         self.tokenizer = torchlanguage.transforms.Token()
+        self.last_file = None
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -99,6 +100,9 @@ class ReutersC50Dataset(Dataset):
         """
         # Current file
         text_path, author_name = self.texts[idx]
+
+        # Last file
+        self.last_file = (text_path, author_name)
 
         # Read text
         text_content = codecs.open(text_path, 'r', encoding='utf-8').read()
