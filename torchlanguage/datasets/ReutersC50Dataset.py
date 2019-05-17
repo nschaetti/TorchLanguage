@@ -12,6 +12,7 @@ import json
 import codecs
 import random
 import pickle
+import numpy as np
 from datetime import datetime
 
 
@@ -23,7 +24,7 @@ class ReutersC50Dataset(Dataset):
 
     # Constructor
     def __init__(self, root='./data', download=False, n_authors=50, dataset_size=100, dataset_start=0, authors=None,
-                 transform=None, retain_transform=False, load_transform=False):
+                 transform=None, retain_transform=False, load_transform=False, load_features=u""):
         """
         Constructor
         :param root: Data root directory.
@@ -33,6 +34,7 @@ class ReutersC50Dataset(Dataset):
         :param authors: The list of authors name to load.
         :param transform: A TextTransformer object to apply.
         :param retain_transform:
+        :param load_features: Load pre-computed features ?
         """
         # Properties
         self.root = root
@@ -49,6 +51,7 @@ class ReutersC50Dataset(Dataset):
         self.last_tokens = None
         self.tokenizer = torchlanguage.transforms.Token()
         self.last_file = None
+        self.load_features = load_features
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -124,6 +127,18 @@ class ReutersC50Dataset(Dataset):
                 to_be_saved = True
             else:
                 to_be_saved = False
+            # end if
+
+            # Load features
+            if self.load_features != u"":
+                # Root text path
+                root_text_path = text_path[:-4]
+
+                # Load features
+                text_features = np.load(root_text_path + u"." + self.load_features + u".npy")
+
+                # Concate
+                transformed = torch.cat((transformed, text_features), dim=1)
             # end if
 
             # Transformed size
