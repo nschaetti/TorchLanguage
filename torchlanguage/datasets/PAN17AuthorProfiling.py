@@ -23,22 +23,31 @@ class PAN17AuthorProfiling(Dataset):
     """
 
     # Constructor
-    def __init__(self, lang, root='./data', download=False, transform=None):
+    def __init__(self, lang, outputs_length, output_dim, output_type='float', n_tweets=100, root='./data',
+                 download=False, transform=None):
         """
         Constructor
         :param lang: Which subset to load.
+        :param outputs_length: Output vector length.
+        :param output_dim: Output dimension
         :param root: Data root directory.
         :param download: Download the dataset?
         :param transform: A TextTransformer object to apply.
         """
         # Properties
         self.root = root
+        self.outputs_length = outputs_length
+        self.output_dim = output_dim
         self.transform = transform
         self.last_tokens = None
         self.tokenizer = torchlanguage.transforms.Token()
         self.lang = lang
         self.user_tweets = list()
         self.ground_truths = dict()
+        self.long_tweet = 0
+        self.n_tweets = n_tweets
+        self.output_type = output_type
+
 
         # To num
         self.gender2num = {'male': 0, 'female': 1}
@@ -83,55 +92,77 @@ class PAN17AuthorProfiling(Dataset):
         :return:
         """
         # Current user
-        user_id = self.user_tweets[idx]
+        user_id, _, _ = self.user_tweets[idx]
+
+        # Empty vector
+        output_vector = torch.zeros(self.n_tweets, self.outputs_length, self.output_dim)
 
         # Read XML file
         tree = ET.parse(os.path.join(self.root, user_id + ".xml"))
         root = tree.getroot()
 
         # Total tweets
-        total_tweets = u""
+        total_tweets = list()
+
+        # Longest tweet
+        self.long_tweet = 0
 
         # For each tweet
-        for elem in root:
-            total_tweets += elem.text + u" "
+        for elem in root[0]:
+            total_tweets.append(elem.text)
+            if len(elem.text) > self.long_tweet:
+                self.long_tweet = len(elem.text)
+            # end if
         # end for
 
         # Last text
-        self.last_tokens = self.tokenizer(total_tweets)
+        self.last_tokens = self.tokenizer(total_tweets[-1])
 
         # Transform
         if self.transform is not None:
-            # Transform
-            transformed = self.transform(total_tweets)
+            # For each tweets
+            for tweet_i, tweet in enumerate(total_tweets):
+                # Transform
+                transformed = self.transform(tweet)
 
-            # Transformed size
-            if type(transformed) is list:
-                transformed_size = len(transformed)
-            elif type(transformed) is torch.LongTensor or type(transformed) is torch.FloatTensor \
-                    or type(transformed) is torch.cuda.LongTensor or type(transformed) is torch.cuda.FloatTensor \
-                    or type(transformed) is torch.Tensor:
-                transformed_dim = transformed.dim()
-                transformed_size = transformed.size(transformed_dim - 2)
-            # end if
+                # Transformed size
+                if type(transformed) is list:
+                    transformed_size = len(transformed)
+                elif type(transformed) is torch.LongTensor or type(transformed) is torch.FloatTensor \
+                        or type(transformed) is torch.cuda.LongTensor or type(transformed) is torch.cuda.FloatTensor \
+                        or type(transformed) is torch.Tensor:
+                    transformed_dim = transformed.dim()
+                    transformed_size = transformed.size(transformed_dim - 2)
+                else:
+                    raise Exception("Unknown transformed type")
+                # end if
 
-            return (transformed,
+                # Add to outputs
+                output_vector[tweet_i, :transformed_size] = transformed
+            # end for
+
+            return (
+                output_vector,
+                self.ground_truths[user_id][0],
+                self.ground_truths[user_id][1],
+                self._create_labels(
                     self.ground_truths[user_id][0],
-                    self.ground_truths[user_id][1],
-                    self._create_labels(self.ground_truths[user_id][0], self.ground_truths[user_id][1], transformed_size))
+                    self.ground_truths[user_id][1]
+                )
+            )
         else:
-            return (total_tweets,
-                    self.ground_truths[user_id][0],
-                    self.ground_truths[user_id][1])
+            return (
+                total_tweets,
+                self.ground_truths[user_id][0],
+                self.ground_truths[user_id][1]
+            )
         # end if
     # end __getitem__
 
-    ##############################################
-    # PRIVATE
-    ##############################################
+    #region PRIVATE
 
     # Create labels
-    def _create_labels(self, user_gender, user_country, transformed_length):
+    def _create_labels(self, user_gender, user_country):
         """
         Create labels
         :param user_gender:
@@ -143,13 +174,21 @@ class PAN17AuthorProfiling(Dataset):
         gender_num = self.gender2num[user_gender]
         country_num = self.country2num[self.lang][user_country]
 
-        # Gender vector
-        gender_vector = torch.zeros(transformed_length, 2)
-        gender_vector[:, gender_num] = 1.0
+        if self.output_type == 'float':
+            # Gender vector
+            gender_vector = torch.zeros(self.n_tweets, self.outputs_length, 2)
+            gender_vector[:, :, gender_num] = 1.0
 
-        # Country vector
-        country_vector = torch.zeros(transformed_length, self.country_size[self.lan])
-        country_vector[:, country_num] = 1.0
+            # Country vector
+            country_vector = torch.zeros(self.n_tweets, self.outputs_length, self.country_size[self.lang])
+            country_vector[:, :, country_num] = 1.0
+        else:
+            # Gender vector
+            gender_vector = torch.LongTensor(self.n_tweets, self.outputs_length).fill_(gender_num)
+
+            # Country vector
+            country_vector = torch.LongTensor(self.n_tweets, self.outputs_length).fill_(country_num)
+        # end if
 
         return (gender_vector, country_vector)
     # end _create_labels
@@ -199,9 +238,11 @@ class PAN17AuthorProfiling(Dataset):
             user_id, user_gender, user_country = line.split(":::")
 
             # Add
-            self.user_tweets.append((user_id, user_gender, user_country))
-            self.ground_truths[user_id] = (user_gender, user_country)
+            self.user_tweets.append((user_id, user_gender, user_country[:-1]))
+            self.ground_truths[user_id] = (user_gender, user_country[:-1])
         # end for
     # end _load
+
+    #endregion PRIVATE
 
 # end ReutersC50Dataset

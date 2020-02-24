@@ -2,10 +2,10 @@
 #
 
 # Imports
-import datasets
-import models
-import transforms
-import utils
+from . import datasets
+from . import models
+from . import transforms
+from . import utils
 
 
 # All TorchLanguage's modules

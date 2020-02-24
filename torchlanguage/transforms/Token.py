@@ -61,11 +61,13 @@ class Token(Transformer):
         # For each tokens
         if self.model == 'nltk':
             for token in nltk.word_tokenize(text, language=self.lang):
-                tokens.append(unicode(token))
+                # tokens.append(unicode(token))
+                tokens.append(str(token))
             # end for
         else:
             for token in self.nlp(text):
-                tokens.append(unicode(token.text))
+                # tokens.append(unicode(token.text))
+                tokens.append(str(token))
             # end for
         # end if
 
