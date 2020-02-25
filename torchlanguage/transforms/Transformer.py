@@ -61,7 +61,7 @@ class Transformer(object):
             if u"_" not in attr:
                 attr_value = getattr(self, attr)
                 if type(attr_value) is int or type(attr_value) is float or type(attr_value) is str or type(
-                        attr_value) is unicode or type(attr_value) is tuple:
+                        attr_value) is str or type(attr_value) is tuple:
                     add_begin = " " if index != 0 else ""
                     init_str += add_begin + "{}={}, ".format(attr, getattr(self, attr))
                     index += 1
@@ -89,14 +89,14 @@ class Transformer(object):
         :return:
         """
         # Class
-        init_str = unicode(type(self).__name__) + u"("
+        init_str = str(type(self).__name__) + u"("
 
         # For each attributes
         index = 0
         for attr in dir(self):
             if "_" not in attr:
                 attr_value = getattr(self, attr)
-                if type(attr_value) is int or type(attr_value) is float or type(attr_value) is str or type(attr_value) is unicode or type(attr_value) is tuple:
+                if type(attr_value) is int or type(attr_value) is float or type(attr_value) is str or type(attr_value) is str or type(attr_value) is tuple:
                     add_begin = u" " if index != 0 else u""
                     init_str += add_begin + u"{}={}, ".format(attr, getattr(self, attr))
                     index += 1

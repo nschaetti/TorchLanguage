@@ -5,15 +5,11 @@
 import torch
 from torch.utils.data.dataset import Dataset
 import torchlanguage.transforms
-import urllib
+import urllib.request
 import os
 import zipfile
-import json
-import codecs
-import random
-import pickle
-from datetime import datetime
 import xml.etree.ElementTree as ET
+import random
 
 
 # PAN 17 Author Profiling
@@ -24,7 +20,7 @@ class PAN17AuthorProfiling(Dataset):
 
     # Constructor
     def __init__(self, lang, outputs_length, output_dim, output_type='float', n_tweets=100, root='./data',
-                 download=False, transform=None):
+                 download=False, transform=None, shuffle=False):
         """
         Constructor
         :param lang: Which subset to load.
@@ -47,7 +43,7 @@ class PAN17AuthorProfiling(Dataset):
         self.long_tweet = 0
         self.n_tweets = n_tweets
         self.output_type = output_type
-
+        self.shuffle = True
 
         # To num
         self.gender2num = {'male': 0, 'female': 1}
@@ -212,7 +208,7 @@ class PAN17AuthorProfiling(Dataset):
         path_to_zip = os.path.join(self.root, "pan17-author-profiling.zip")
 
         # Download
-        urllib.urlretrieve("http://www.nilsschaetti.com/datasets/pan17-author-profiling.zip", path_to_zip)
+        urllib.request.urlretrieve("http://www.nilsschaetti.com/datasets/pan17-author-profiling.zip", path_to_zip)
 
         # Unzip
         zip_ref = zipfile.ZipFile(path_to_zip, 'r')
@@ -241,6 +237,11 @@ class PAN17AuthorProfiling(Dataset):
             self.user_tweets.append((user_id, user_gender, user_country[:-1]))
             self.ground_truths[user_id] = (user_gender, user_country[:-1])
         # end for
+
+        # Shuffle list of users
+        if self.shuffle:
+            random.shuffle(self.user_tweets)
+        # end if
     # end _load
 
     #endregion PRIVATE

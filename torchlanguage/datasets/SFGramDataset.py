@@ -22,7 +22,8 @@ class SFGramDataset(Dataset):
     """
 
     # Constructor
-    def __init__(self, author, root='./data', download=False, transform=None, load_type='wv', remove_texts=None, homogeneous=True):
+    def __init__(self, author, root='./data', download=False, transform=None, load_type='wv', remove_texts=None,
+                 homogeneous=True, stream=False, block_length=40):
         """
         Constructor
         :param root: Data root directory.
@@ -47,6 +48,8 @@ class SFGramDataset(Dataset):
         self.remove_texts = remove_texts
         self.homogenous = homogeneous
         self.text2author = dict()
+        self.stream = stream
+        self.block_length = block_length
 
         # Create directory if needed
         if not os.path.exists(self.root):
@@ -62,9 +65,7 @@ class SFGramDataset(Dataset):
         self._load()
     # end __init__
 
-    #############################################
-    # PUBLIC
-    #############################################
+    #region PUBLIC
 
     # Segment text by authors
     def segment_text(self, text_content):
@@ -105,6 +106,38 @@ class SFGramDataset(Dataset):
         return segments
     # end segment_text
 
+    # Transform length
+    def transform_length(self, text_path):
+        """
+        Get transformed text length
+        """
+        # Read text
+        text_content = codecs.open(text_path, 'r', encoding='utf-8').read()
+
+        # Segment text
+        segments = self.segment_text(text_content)
+
+        # Transform
+        if self.transform is not None:
+            # Path to text information
+            path_info = "{}.{}.{}.json".format(text_path, self.load_type, self.author)
+
+            # Apply or load
+            if os.path.exists(path_info):
+                # Load information from JSON
+                text_info = json.loads(codecs.open(path_info, 'r', encoding='utf-8').read())
+            else:
+                # Get transformed text
+                text_transformed = self.transform(text_content)
+
+                # Save information
+                json.dumps({'path': text_path, 'segments': len(segments), 'transformed_length': text_transformed_length})
+            # end if
+
+
+        # end if
+    # end transform_length
+
     # Transform text
     def transform_text(self, text_path, n, text_content, author_prob):
         """
@@ -114,8 +147,8 @@ class SFGramDataset(Dataset):
         # Transform
         if self.transform is not None:
             # Path to transformation
-            path_transform = "{}.{}.{}.p".format(text_path, self.load_type, n)
-            # print(path_transform)
+            path_transform = "{}.{}.{}.{}.p".format(text_path, self.load_type, n, self.author)
+
             # Apply or load
             if os.path.exists(path_transform):
                 transformed = torch.load(path_transform)
@@ -140,9 +173,9 @@ class SFGramDataset(Dataset):
         # end if
     # end transform_text
 
-    #############################################
-    # OVERRIDE
-    #############################################
+    #endregion PUBLIC
+
+    #region OVERRIDE
 
     # Length
     def __len__(self):
@@ -223,9 +256,9 @@ class SFGramDataset(Dataset):
         return text_transformed, text_labels
     # end __getitem__
 
-    ##############################################
-    # PRIVATE
-    ##############################################
+    #endregion OVERRIDE
+
+    #region PRIVATE
 
     # Create labels
     def _create_labels(self, author_prob, transformed_length):
@@ -371,4 +404,6 @@ class SFGramDataset(Dataset):
         return homogenous_list
     # end _make_homogenous
 
-# end ReutersC50Dataset
+    #endregion PRIVATE
+
+# end SFGramDataset
