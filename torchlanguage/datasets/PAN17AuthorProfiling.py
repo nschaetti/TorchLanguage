@@ -20,7 +20,7 @@ class PAN17AuthorProfiling(Dataset):
 
     # Constructor
     def __init__(self, lang, outputs_length, output_dim, output_type='float', n_tweets=100, root='./data',
-                 download=False, transform=None, shuffle=False):
+                 trained=False, download=False, transform=None, shuffle=False):
         """
         Constructor
         :param lang: Which subset to load.
@@ -38,6 +38,7 @@ class PAN17AuthorProfiling(Dataset):
         self.last_tokens = None
         self.tokenizer = torchlanguage.transforms.Token()
         self.lang = lang
+        self.trained = trained
         self.user_tweets = list()
         self.ground_truths = dict()
         self.long_tweet = 0
@@ -91,7 +92,14 @@ class PAN17AuthorProfiling(Dataset):
         user_id, _, _ = self.user_tweets[idx]
 
         # Empty vector
-        output_vector = torch.zeros(self.n_tweets, self.outputs_length, self.output_dim)
+        if not self.trained:
+            output_vector = torch.zeros(self.n_tweets, self.outputs_length, self.output_dim)
+        else:
+            output_vector = torch.LongTensor(self.n_tweets, self.outputs_length).fill_(0)
+        # end if
+
+        # Length vector
+        lengths_vector = torch.LongTensor(self.n_tweets)
 
         # Read XML file
         tree = ET.parse(os.path.join(self.root, user_id + ".xml"))
@@ -135,6 +143,9 @@ class PAN17AuthorProfiling(Dataset):
 
                 # Add to outputs
                 output_vector[tweet_i, :transformed_size] = transformed
+
+                # Length of tweet
+                lengths_vector[tweet_i] = len(tweet)
             # end for
 
             return (
@@ -144,13 +155,15 @@ class PAN17AuthorProfiling(Dataset):
                 self._create_labels(
                     self.ground_truths[user_id][0],
                     self.ground_truths[user_id][1]
-                )
+                ),
+                lengths_vector
             )
         else:
             return (
                 total_tweets,
                 self.ground_truths[user_id][0],
-                self.ground_truths[user_id][1]
+                self.ground_truths[user_id][1],
+                lengths_vector
             )
         # end if
     # end __getitem__
