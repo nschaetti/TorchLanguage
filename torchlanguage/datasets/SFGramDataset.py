@@ -73,8 +73,111 @@ class SFGramDataset(Dataset):
         Precompute documents in the dataset
         :param target_path: Target directory where to save transformed text
         """
+        # Positions
+        pos = 0
+
+        # Number of files
+        n_files = 0
+
+        # List of positions
+        list_of_positions = dict()
+
+        # Vocabulary size
+        voc_size = 0
+
+        # Total token from the author
+        total_trues = 0
+
+        # Files info
+        files_info = dict()
+
+        # Author target path
+        author_target_path = os.path.join(target_path, self.author)
+
+        # Create if it does not exists
+        if not os.path.exists(author_target_path):
+            os.mkdir(author_target_path)
+        # end if
+
+        # For each text in the dataset
+        for text_i, text_path in enumerate(self.texts):
+            # Transform document to inputs and outputs
+            document_inputs, document_outputs = self.transform_document(text_path)
+
+            # Add to path
+            path_transform = os.path.join(author_target_path, "{}".format(self.load_type))
+
+            # Create if does not exists
+            if not os.path.exists(path_transform):
+                os.mkdir(path_transform)
+            # end if
+
+            # Add file
+            path_transform = os.path.join(
+                path_transform,
+                "sfgram.{}.p".format(text_i)
+            )
+
+            # Apply or load
+            torch.save((document_inputs, document_outputs), path_transform)
+
+            # Add to position information
+            list_of_positions[pos] = text_i
+
+            # How many token from the author
+            author_trues = torch.sum(document_outputs).item()
+            total_trues += author_trues
+
+            # File information
+            files_info[text_i] = {
+                'basename': os.path.basename(text_path),
+                'length': document_inputs.size(0),
+                'trues': author_trues,
+                'i': text_i,
+                'path': text_path
+            }
+
+            # Voc size
+            if torch.max(document_inputs).item() > voc_size:
+                voc_size = torch.max(document_inputs).item()
+            # end if
+
+            # Next start positions
+            pos += document_inputs.size(0)
+
+            # N files
+            n_files += 1
+        # end for
+
+        # Save information
+        json.dump(
+            {
+                'author': self.author,
+                'feature': self.load_type,
+                'positions': list_of_positions,
+                'length': pos,
+                'n_files': n_files,
+                'files': files_info,
+                'trues': total_trues,
+                'voc_size': voc_size,
+                'tensor_dim': document_inputs.dim(),
+                'tensor_type': 'float' if document_inputs.dim() == 2 else 'long',
+                'input_dim': document_inputs.size(-1) if document_inputs.dim() == 2 else 0
+            },
+            open(os.path.join(author_target_path, "sfgam_info.{}.json".format(self.load_type)), 'w'),
+            sort_keys=True,
+            indent=4
+        )
+    # end precompute_documents
+
+    # Precompute documents in the dataset
+    # def precompute_documents(self, target_path):
+        """
+        Precompute documents in the dataset
+        :param target_path: Target directory where to save transformed text
+        """
         # Number of diskblocks
-        n_diskblocks = 0
+        """n_diskblocks = 0
 
         # For each text in the dataset
         for text_path in self.texts:
@@ -143,7 +246,7 @@ class SFGramDataset(Dataset):
                 'feature': self.load_type
             },
             open(os.path.join(target_path, "sfgam_info.{}.{}.json".format(self.load_type, self.author)), 'w')
-        )
+        )"""
     # end precompute_documents
 
     # Segment text by authors
