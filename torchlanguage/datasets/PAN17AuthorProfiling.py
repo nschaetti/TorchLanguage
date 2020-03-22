@@ -20,7 +20,7 @@ class PAN17AuthorProfiling(Dataset):
 
     # Constructor
     def __init__(self, lang, outputs_length, output_dim, output_type='float', n_tweets=100, root='./data',
-                 trained=False, download=False, transform=None, shuffle=False):
+                 trained=False, download=False, transform=None, shuffle=True, per_tweet=False):
         """
         Constructor
         :param lang: Which subset to load.
@@ -44,7 +44,9 @@ class PAN17AuthorProfiling(Dataset):
         self.long_tweet = 0
         self.n_tweets = n_tweets
         self.output_type = output_type
-        self.shuffle = True
+        self.shuffle = shuffle
+        self.per_tweet = per_tweet
+        self.user2tweets = dict()
 
         # To num
         self.gender2num = {'male': 0, 'female': 1}
@@ -68,23 +70,96 @@ class PAN17AuthorProfiling(Dataset):
         self._load()
     # end __init__
 
-    #############################################
-    # OVERRIDE
-    #############################################
-
-    # Length
-    def __len__(self):
+    # Get item per tweet
+    def get_item_per_tweet(self, idx):
         """
-        Length
+        Get item per tweet
+        :param idx:
         :return:
         """
-        return len(self.user_tweets)
-    # end __len__
+        # User and tweet position
+        user_position = int(idx / 100.0)
+        tweet_position = idx - (user_position * 100)
 
-    # Get item
-    def __getitem__(self, idx):
+        # Current user
+        user_id, _, _ = self.user_tweets[user_position]
+
+        # Empty vector
+        if not self.trained:
+            output_vector = torch.zeros(self.outputs_length, self.output_dim)
+        else:
+            output_vector = torch.LongTensor(self.outputs_length).fill_(0)
+        # end if
+
+        # Length vector
+        lengths_vector = torch.LongTensor(1)
+
+        # Total tweets
+        total_tweets = self.user2tweets[user_id]
+
+        # Tweet length
+        self.long_tweet = 0
+
+        # For each tweet
+        for tweet in total_tweets:
+            if len(tweet) > self.long_tweet:
+                self.long_tweet = len(tweet)
+            # end if
+        # end for
+
+        # Last text
+        self.last_tokens = self.tokenizer(total_tweets[-1])
+
+        # Transform
+        if self.transform is not None:
+            # Tweet
+            tweet = total_tweets[tweet_position]
+
+            # Transform
+            transformed = self.transform(tweet)
+
+            # Transformed size
+            if type(transformed) is list:
+                transformed_size = len(transformed)
+            elif type(transformed) is torch.LongTensor or type(transformed) is torch.FloatTensor \
+                    or type(transformed) is torch.cuda.LongTensor or type(transformed) is torch.cuda.FloatTensor \
+                    or type(transformed) is torch.Tensor:
+                transformed_dim = transformed.dim()
+                transformed_size = transformed.size(transformed_dim - 2)
+            else:
+                raise Exception("Unknown transformed type")
+            # end if
+
+            # Add to outputs
+            output_vector[:transformed_size] = transformed
+
+            # Length of tweet
+            lengths_vector[0] = len(tweet)
+
+            return (
+                output_vector,
+                self.ground_truths[user_id][0],
+                self.ground_truths[user_id][1],
+                self._create_labels(
+                    self.ground_truths[user_id][0],
+                    self.ground_truths[user_id][1]
+                ),
+                lengths_vector
+            )
+        else:
+            return (
+                total_tweets,
+                self.ground_truths[user_id][0],
+                self.ground_truths[user_id][1],
+                lengths_vector
+            )
+        # end if
+    # end get_item_per_tweet
+
+    # Get item per group
+    def get_item_per_group(self, idx):
         """
-        Get item
+        Get item per group
         :param idx:
         :return:
         """
@@ -101,21 +176,16 @@ class PAN17AuthorProfiling(Dataset):
         # Length vector
         lengths_vector = torch.LongTensor(self.n_tweets)
 
-        # Read XML file
-        tree = ET.parse(os.path.join(self.root, user_id + ".xml"))
-        root = tree.getroot()
-
         # Total tweets
-        total_tweets = list()
+        total_tweets = self.user2tweets[user_id]
 
-        # Longest tweet
+        # Tweet length
         self.long_tweet = 0
 
         # For each tweet
-        for elem in root[0]:
-            total_tweets.append(elem.text)
-            if len(elem.text) > self.long_tweet:
-                self.long_tweet = len(elem.text)
+        for tweet in total_tweets:
+            if len(tweet) > self.long_tweet:
+                self.long_tweet = len(tweet)
             # end if
         # end for
 
@@ -166,6 +236,37 @@ class PAN17AuthorProfiling(Dataset):
                 lengths_vector
             )
         # end if
+    # end get_item_per_group
+
+    #############################################
+    # OVERRIDE
+    #############################################
+
+    # Length
+    def __len__(self):
+        """
+        Length
+        :return:
+        """
+        if self.per_tweet:
+            return len(self.user_tweets) * 100
+        else:
+            return len(self.user_tweets)
+        # end if
+    # end __len__
+
+    # Get item
+    def __getitem__(self, idx):
+        """
+        Get item
+        :param idx:
+        :return:
+        """
+        if self.per_tweet:
+            return self.get_item_per_tweet(idx)
+        else:
+            return self.get_item_per_group(idx)
+        # end if
     # end __getitem__
 
     #region PRIVATE
@@ -184,19 +285,37 @@ class PAN17AuthorProfiling(Dataset):
         country_num = self.country2num[self.lang][user_country]
 
         if self.output_type == 'float':
-            # Gender vector
-            gender_vector = torch.zeros(self.n_tweets, self.outputs_length, 2)
-            gender_vector[:, :, gender_num] = 1.0
+            if self.per_tweet:
+                # Gender vector
+                gender_vector = torch.zeros(self.outputs_length, 2)
+                gender_vector[:, gender_num] = 1.0
 
-            # Country vector
-            country_vector = torch.zeros(self.n_tweets, self.outputs_length, self.country_size[self.lang])
-            country_vector[:, :, country_num] = 1.0
+                # Country vector
+                country_vector = torch.zeros(self.outputs_length, self.country_size[self.lang])
+                country_vector[:, country_num] = 1.0
+            else:
+                # Gender vector
+                gender_vector = torch.zeros(self.n_tweets, self.outputs_length, 2)
+                gender_vector[:, :, gender_num] = 1.0
+
+                # Country vector
+                country_vector = torch.zeros(self.n_tweets, self.outputs_length, self.country_size[self.lang])
+                country_vector[:, :, country_num] = 1.0
+            # end if
         else:
-            # Gender vector
-            gender_vector = torch.LongTensor(self.n_tweets, self.outputs_length).fill_(gender_num)
+            if self.per_tweet:
+                # Gender vector
+                gender_vector = torch.LongTensor(self.outputs_length).fill_(gender_num)
 
-            # Country vector
-            country_vector = torch.LongTensor(self.n_tweets, self.outputs_length).fill_(country_num)
+                # Country vector
+                country_vector = torch.LongTensor(self.outputs_length).fill_(country_num)
+            else:
+                # Gender vector
+                gender_vector = torch.LongTensor(self.n_tweets, self.outputs_length).fill_(gender_num)
+
+                # Country vector
+                country_vector = torch.LongTensor(self.n_tweets, self.outputs_length).fill_(country_num)
+            # end if
         # end if
 
         return (gender_vector, country_vector)
@@ -246,9 +365,22 @@ class PAN17AuthorProfiling(Dataset):
             # Split
             user_id, user_gender, user_country = line.split(":::")
 
+            # Read XML file
+            tree = ET.parse(os.path.join(self.root, user_id + ".xml"))
+            root = tree.getroot()
+
+            # User tweets
+            total_tweets = list()
+
+            # For each tweet
+            for elem in root[0]:
+                total_tweets.append(elem.text)
+            # end for
+
             # Add
             self.user_tweets.append((user_id, user_gender, user_country[:-1]))
             self.ground_truths[user_id] = (user_gender, user_country[:-1])
+            self.user2tweets[user_id] = total_tweets
         # end for
 
         # Shuffle list of users
