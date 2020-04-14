@@ -20,7 +20,7 @@ class PAN17AuthorProfiling(Dataset):
 
     # Constructor
     def __init__(self, lang, outputs_length, output_dim, load_type, output_type='float', n_tweets=100, root='./data',
-                 trained=False, download=False, transform=None, shuffle=True, per_tweet=False):
+                 trained=False, download=False, transform=None, shuffle=True, per_tweet=False, save_transform=False):
         """
         Constructor
         :param lang: Which subset to load.
@@ -48,6 +48,7 @@ class PAN17AuthorProfiling(Dataset):
         self.shuffle = shuffle
         self.per_tweet = per_tweet
         self.user2tweets = dict()
+        self.save_transform = save_transform
 
         # To num
         self.gender2num = {'male': 0, 'female': 1}
@@ -320,7 +321,7 @@ class PAN17AuthorProfiling(Dataset):
             # end for
 
             # Precomputed if necessary
-            if not os.path.exists(precomputed_path):
+            if not os.path.exists(precomputed_path) and self.save_transform:
                 # Transform tweets
                 tweets_inputs, [tweets_gender_outputs, tweets_country_outputs], tweets_lengths = self._transform_xml(
                     xml_path,
