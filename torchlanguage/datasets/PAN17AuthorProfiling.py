@@ -148,32 +148,51 @@ class PAN17AuthorProfiling(Dataset):
         # Last text
         self.last_tokens = self.tokenizer(total_tweets[-1])
 
+        # Path to precomputed version
+        precomputed_path = os.path.join(self.root, user_id + "." + self.load_type + ".xml")
+
         # Transform
         if self.transform is not None:
-            # For each tweets
-            for tweet_i, tweet in enumerate(total_tweets):
-                # Transform
-                transformed = self.transform(tweet)
+            # Precomputer exists
+            if not os.path.exists(precomputed_path) or not self.save_transform:
+                # Transform each tweets
+                for tweet_i, tweet in enumerate(total_tweets):
+                    # Transform
+                    transformed = self.transform(tweet)
 
-                # Transformed size
-                if type(transformed) is list:
-                    transformed_size = len(transformed)
-                elif type(transformed) is torch.LongTensor or type(transformed) is torch.FloatTensor \
-                        or type(transformed) is torch.cuda.LongTensor or type(transformed) is torch.cuda.FloatTensor \
-                        or type(transformed) is torch.Tensor:
-                    transformed_dim = transformed.dim()
-                    transformed_size = transformed.size(transformed_dim - 2)
-                else:
-                    raise Exception("Unknown transformed type")
+                    # Transformed size
+                    if type(transformed) is list:
+                        transformed_size = len(transformed)
+                    elif type(transformed) is torch.LongTensor or type(transformed) is torch.FloatTensor \
+                            or type(transformed) is torch.cuda.LongTensor or type(transformed) is torch.cuda.FloatTensor \
+                            or type(transformed) is torch.Tensor:
+                        transformed_dim = transformed.dim()
+                        transformed_size = transformed.size(transformed_dim - 2)
+                    else:
+                        raise Exception("Unknown transformed type")
+                    # end if
+
+                    # Add to outputs
+                    output_vector[tweet_i, :transformed_size] = transformed
+
+                    # Length of tweet
+                    lengths_vector[tweet_i] = len(tweet)
+                # end for
+
+                # Save if needed
+                if self.save_transform:
+                    # Save tweets
+                    torch.save(
+                        (output_vector, lengths_vector),
+                        precomputed_path
+                    )
                 # end if
+            else:
+                # Load precomputed
+                output_vector, lengths_vector = torch.load(precomputed_path)
+            # end if
 
-                # Add to outputs
-                output_vector[tweet_i, :transformed_size] = transformed
-
-                # Length of tweet
-                lengths_vector[tweet_i] = len(tweet)
-            # end for
-
+            # Return
             return (
                 output_vector,
                 self.ground_truths[user_id][0],
@@ -321,7 +340,7 @@ class PAN17AuthorProfiling(Dataset):
             # end for
 
             # Precomputed if necessary
-            if not os.path.exists(precomputed_path) and self.save_transform:
+            """if not os.path.exists(precomputed_path) and self.save_transform:
                 # Transform tweets
                 tweets_inputs, [tweets_gender_outputs, tweets_country_outputs], tweets_lengths = self._transform_xml(
                     xml_path,
@@ -334,7 +353,7 @@ class PAN17AuthorProfiling(Dataset):
                     (tweets_inputs, tweets_gender_outputs, tweets_country_outputs, tweets_lengths),
                     precomputed_path
                 )
-            # end if
+            # end if"""
 
             # Add
             self.user_tweets.append((user_id, user_gender, user_country[:-1]))
