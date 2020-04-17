@@ -172,11 +172,19 @@ class PAN17AuthorProfiling(Dataset):
                         raise Exception("Unknown transformed type")
                     # end if
 
+                    # Final size
+                    if transformed_size > self.outputs_length:
+                        final_size = self.outputs_length
+                    else:
+                        final_size = transformed_size
+                    # end if
+
                     # Add to outputs
-                    output_vector[tweet_i, :transformed_size] = transformed
+                    output_vector[tweet_i, :final_size] = transformed[:final_size]
 
                     # Length of tweet
-                    lengths_vector[tweet_i] = len(tweet)
+                    # lengths_vector[tweet_i] = len(tweet)
+                    lengths_vector[tweet_i] = final_size
                 # end for
 
                 # Save if needed
