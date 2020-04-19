@@ -49,7 +49,7 @@ class CNNCTweet(nn.Module):
 
     # Constructor
     def __init__(self, text_length, vocab_size, embedding_dim=300, out_channels=(500, 500, 500),
-                 kernel_sizes=(3, 4, 5), n_classes=2):
+                 kernel_sizes=(3, 4, 5), n_classes=2, dropout=0.5):
         """
         Constructor
         :param vocab_size: Vocabulary size
@@ -83,6 +83,9 @@ class CNNCTweet(nn.Module):
         self.max_pool_w1 = nn.MaxPool1d(kernel_size=text_length - kernel_sizes[0] + 1, stride=0)
         self.max_pool_w2 = nn.MaxPool1d(kernel_size=text_length - kernel_sizes[1] + 1, stride=0)
         self.max_pool_w3 = nn.MaxPool1d(kernel_size=text_length - kernel_sizes[2] + 1, stride=0)
+
+        # Dropout
+        self.dropout = nn.Dropout(p=dropout)
 
         # Linear layer
         self.linear_size = out_channels[0] + out_channels[1] + out_channels[2]
@@ -122,6 +125,9 @@ class CNNCTweet(nn.Module):
 
         # Flatten
         out = out.view(-1, self.linear_size)
+
+        # Dropout
+        out = self.dropout(out)
 
         # Linear
         out = self.linear(out)
