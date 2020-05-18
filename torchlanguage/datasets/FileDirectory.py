@@ -104,8 +104,8 @@ class FileDirectory(Dataset):
         for file_name in os.listdir(self.root):
             if file_name[-4:] == ".txt":
                 # Get class name
-                class_name = unicode(file_name[:file_name.find("_")])
-                title = unicode(file_name[file_name.find("_")+1:-4])
+                class_name = str(file_name[:file_name.find("_")])
+                title = str(file_name[file_name.find("_")+1:-4])
                 samples.append((file_name, class_name, title))
                 if class_name not in classes:
                     classes.append(class_name)

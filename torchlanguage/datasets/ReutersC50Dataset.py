@@ -14,6 +14,7 @@ import random
 import pickle
 import numpy as np
 from datetime import datetime
+import urllib.request
 
 
 # Reuters C50 dataset
@@ -233,7 +234,8 @@ class ReutersC50Dataset(Dataset):
         path_to_zip = os.path.join(self.root, "reutersc50.zip")
 
         # Download
-        urllib.urlretrieve("http://www.nilsschaetti.com/datasets/reutersc50.zip", path_to_zip)
+        # urllib.urlretrieve("http://www.nilsschaetti.com/datasets/reutersc50.zip", path_to_zip)
+        urllib.request.urlretrieve("http://www.nilsschaetti.com/datasets/reutersc50.zip", path_to_zip)
 
         # Unzip
         zip_ref = zipfile.ZipFile(path_to_zip, 'r')
